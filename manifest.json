@@ -1,0 +1,14 @@
+{
+  "name": "Rangkai Karpet Studio",
+  "short_name": "Karpet Studio",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1E1912",
+  "theme_color": "#1E1912",
+  "lang": "id",
+  "icons": [
+    { "src": "icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
