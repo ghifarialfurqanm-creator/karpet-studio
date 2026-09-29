@@ -18,29 +18,104 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Karpet Studio">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
 <style>
-:root{
-  --ink:#1E1912; --paper:#F3EEDF; --paper2:#FFFDF6; --loom:#26211A;
-  --gold:#C4933B; --rust:#9C3F2B; --thread:#2F5D62; --line:#DFD3AF;
-  --ok:#3F6B4E; --muted:#8A7F63; --scenebg:#E9E2D0; --card-shadow:rgba(30,25,18,.5); --chrome-fg:#F3EEDF;
-  --r-safe-t:env(safe-area-inset-top,0px); --r-safe-b:env(safe-area-inset-bottom,0px);
-}
-*{-webkit-tap-highlight-color:transparent;}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --ink:#F1EAD8; --paper:#15120E; --paper2:#1F1A14; --loom:#0C0A08;
-    --gold:#DDAA55; --rust:#C96B4C; --thread:#6FB3B9; --line:#3B3327;
-    --ok:#5FAE7D; --muted:#A89877; --scenebg:#231D16; --card-shadow:rgba(0,0,0,.6);
+  :root {
+    color-scheme: light;
+
+    /* Canvas — cool off-white, netral */
+    --canvas-bg: #F6F7F9;
+    --canvas-dot: rgba(15, 23, 42, 0.06);
+
+    /* UI Panel (toolbar & sidebar) */
+    --ui-panel: #1A1D24;
+    --ui-panel-text: #E6EDF3;
+    --ui-muted: #8B95A5;
+
+    /* Ink (teks di kartu) */
+    --ink: #0F172A;
+    --ink-soft: #64748B;
+
+    /* Accent — blue modern */
+    --accent: #3B82F6;
+    --accent-text: #FFFFFF;
+
+    /* Paper / kartu — pastel lembut */
+    --paper-note: #FEF3C7;
+    --paper-note-edge: #FDE68A;
+    --paper-link: #DBEAFE;
+    --paper-link-edge: #BFDBFE;
+    --paper-image: #FFFFFF;
+    --paper-image-edge: #E5E7EB;
+
+    /* Pin & status */
+    --pin: #EF4444;
+    --danger: #EF4444;
+    --shadow: rgba(15, 23, 42, 0.08);
+    --panel-row-hover: rgba(255, 255, 255, 0.06);
   }
-}
-:root[data-theme="dark"]{
-  --ink:#F1EAD8; --paper:#15120E; --paper2:#1F1A14; --loom:#0C0A08;
-  --gold:#DDAA55; --rust:#C96B4C; --thread:#6FB3B9; --line:#3B3327;
-  --ok:#5FAE7D; --muted:#A89877; --scenebg:#231D16; --card-shadow:rgba(0,0,0,.6);
-}
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+
+      /* Canvas — TRUE slate black, bukan brown */
+      --canvas-bg: #0D1117;
+      --canvas-dot: rgba(148, 163, 184, 0.08);
+
+      --ui-panel: #161B22;
+      --ui-panel-text: #E6EDF3;
+      --ui-muted: #6E7681;
+
+      --ink: #0F172A;
+      --ink-soft: #64748B;
+
+      --accent: #58A6FF;
+      --accent-text: #0D1117;
+
+      --paper-note: #FCD34D;
+      --paper-note-edge: #F59E0B;
+      --paper-link: #60A5FA;
+      --paper-link-edge: #3B82F6;
+      --paper-image: #D1D5DB;
+      --paper-image-edge: #9CA3AF;
+
+      --pin: #F87171;
+      --danger: #F87171;
+      --shadow: rgba(0, 0, 0, 0.6);
+      --panel-row-hover: rgba(255, 255, 255, 0.06);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+
+    --canvas-bg: #0D1117;
+    --canvas-dot: rgba(148, 163, 184, 0.08);
+
+    --ui-panel: #161B22;
+    --ui-panel-text: #E6EDF3;
+    --ui-muted: #6E7681;
+
+    --ink: #0F172A;
+    --ink-soft: #64748B;
+
+    --accent: #58A6FF;
+    --accent-text: #0D1117;
+
+    --paper-note: #FCD34D;
+    --paper-note-edge: #F59E0B;
+    --paper-link: #60A5FA;
+    --paper-link-edge: #3B82F6;
+    --paper-image: #D1D5DB;
+    --paper-image-edge: #9CA3AF;
+
+    --pin: #F87171;
+    --danger: #F87171;
+    --shadow: rgba(0, 0, 0, 0.6);
+    --panel-row-hover: rgba(255, 255, 255, 0.06);
+  }
 *{box-sizing:border-box}
 button:focus-visible,a:focus-visible{outline:2px solid var(--thread);outline-offset:2px;}
 html{scroll-behavior:smooth;scroll-padding-top:var(--r-safe-t);}
@@ -78,9 +153,10 @@ header{background:var(--loom);padding-top:calc(var(--r-safe-t) + 14px);transitio
 .acc-body{padding:0 18px 18px;border-top:1px solid var(--line);padding-top:16px;}
 
 /* inputs */
-input[type=number],input[type=text],input[type=date],select,textarea{
+input[type=number],input[type=text],input[type=date],input[type=password],select,textarea{
   background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;
   width:100%;font-size:16px;color:var(--ink);transition:border-color .15s,background .25s;}
+input[type=password]:focus,select:focus{outline:none;border-color:var(--thread);box-shadow:0 0 0 3px rgba(47,93,98,.18);}
 input:focus,select:focus{outline:none;border-color:var(--thread);box-shadow:0 0 0 3px rgba(47,93,98,.18);}
 input[readonly]{background:var(--paper2);color:var(--muted);}
 label{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;display:block;}
@@ -165,7 +241,12 @@ label{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;disp
 .status-menunggu{background:rgba(196,147,59,.18);color:var(--gold);}
 .status-dikonfirmasi{background:rgba(63,107,78,.18);color:var(--ok);}
 .status-selesai{background:rgba(47,93,98,.18);color:var(--thread);}
+.status-dikerjakan{background:rgba(47,93,98,.18);color:var(--thread);}
 .status-kadaluarsa{background:rgba(156,63,43,.18);color:var(--rust);}
+.status-desain{background:rgba(196,147,59,.18);color:var(--gold);}
+.status-produksi{background:rgba(47,93,98,.18);color:var(--thread);}
+.status-finishing{background:rgba(63,107,78,.18);color:var(--ok);}
+.status-siap_kirim{background:rgba(196,147,59,.18);color:var(--gold);}
 
 .toast{position:fixed;bottom:calc(24px + var(--r-safe-b));left:50%;transform:translateX(-50%) translateY(20px);
   background:var(--loom);color:var(--chrome-fg);padding:12px 18px;border-radius:12px;font-size:13px;font-weight:500;
@@ -183,14 +264,393 @@ label{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;disp
 ::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px;}
 
 @media print{
-  body{background:#fff !important;color:#000 !important;}
+  /* Ukuran kertas A4, margin formal */
+  @page{
+    size:A4;
+    margin:14mm 12mm;
+  }
+
+  /* Aktifkan warna background saat print */
+  *{
+    -webkit-print-color-adjust:exact !important;
+    print-color-adjust:exact !important;
+  }
+
+  html,body{
+    background:#fff !important;
+    color:#000 !important;
+    font-size:11pt;
+    padding:0 !important;
+    margin:0 !important;
+  }
+
+  /* Sembunyikan semua kecuali quoteCard */
   body > *:not(#quoteModal){display:none !important;}
-  #quoteModal{position:static !important;background:#fff !important;display:block !important;padding:0 !important;z-index:auto !important;}
-  #quoteModal > div{max-width:100% !important;}
+  #quoteModal{
+    position:static !important;
+    background:transparent !important;
+    display:block !important;
+    padding:0 !important;
+    margin:0 !important;
+    z-index:auto !important;
+  }
+  #quoteModal > div{
+    max-width:100% !important;
+    width:100% !important;
+  }
   #quoteModal .no-print{display:none !important;}
-  #quoteCard{box-shadow:none !important;border:1px solid #ccc !important;}
+
+  /* Quote card: full width, tanpa shadow, tanpa border radius */
+  #quoteCard{
+    box-shadow:none !important;
+    border:none !important;
+    border-radius:0 !important;
+    background:#fff !important;
+    padding:0 !important;
+    max-width:100% !important;
+    width:100% !important;
+  }
+
+  /* Header brand */
+  #quoteLogoWrap{
+    width:52px !important;
+    height:52px !important;
+  }
+  #quoteLogoWrap img{
+    width:100% !important;
+    height:100% !important;
+    object-fit:cover !important;
+  }
+
+  /* Typography */
+  #quoteBrand{
+    font-size:20pt !important;
+    color:#1a1a1a !important;
+  }
+  #quoteModalTitle{
+    font-size:8pt !important;
+    letter-spacing:.15em !important;
+    color:#666 !important;
+    margin-top:2pt !important;
+  }
+  #quoteCard .serif{
+    color:#1a1a1a !important;
+  }
+
+  /* Mockup image */
+  #quoteImgWrap{
+    aspect-ratio:auto !important;
+    max-height:70mm !important;
+    overflow:hidden !important;
+    background:#f5f5f5 !important;
+    border:1px solid #e0e0e0 !important;
+    border-radius:6pt !important;
+    margin:6mm 0 !important;
+    padding:4mm !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+  }
+  #quoteImgWrap img{
+    max-height:62mm !important;
+    max-width:100% !important;
+    width:auto !important;
+    height:auto !important;
+    object-fit:contain !important;
+  }
+
+  /* Labels: kecil abu-abu */
+  #quoteCard span[style*="color:var(--muted)"]{
+    color:#666 !important;
+    font-size:9pt !important;
+  }
+  /* Values: bold hitam */
+  #quoteCard .font-semibold{
+    color:#1a1a1a !important;
+    font-size:10pt !important;
+    font-weight:600 !important;
+  }
+
+  /* Total besar */
+  #qTotal{
+    font-size:18pt !important;
+    color:#1a1a1a !important;
+  }
+
+  /* Garis dashed jadi solid tipis */
+  #quoteCard [style*="border-dashed"]{
+    border-style:solid !important;
+    border-color:#e0e0e0 !important;
+  }
+
+  /* QR code kotak */
+  #qQrWrap{
+    width:22mm !important;
+    height:22mm !important;
+    border:1px solid #e0e0e0 !important;
+  }
+
+  /* Tombol interaktif hilang */
   .toast,#stickyBar{display:none !important;}
+
+  /* Page break rules */
+  #quoteCard{page-break-inside:avoid;}
+  #quoteImgWrap{page-break-inside:avoid;}
+  #quoteCard .mt-5{page-break-inside:avoid;}
 }
+/* Stats & filter riwayat */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;}
+@media(min-width:480px){.stats-grid{grid-template-columns:repeat(4,1fr);}}
+.stat-card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center;}
+.stat-value{font-family:'Fraunces',serif;font-weight:700;font-size:15px;font-variant-numeric:tabular-nums;line-height:1.2;}
+.stat-label{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.03em;}
+
+.filter-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px;scrollbar-width:none;}
+.filter-tabs::-webkit-scrollbar{display:none;}
+.filter-tab{flex-shrink:0;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:600;
+  border:1px solid var(--line);background:var(--paper);color:var(--muted);cursor:pointer;transition:.15s;white-space:nowrap;}
+.filter-tab.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.filter-tab:hover:not(.active){border-color:var(--gold);}
+
+.order-row{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:11px;margin-bottom:8px;transition:.15s;}
+.order-row:hover{border-color:var(--gold);}
+.order-row .head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;}
+.order-row .name{font-size:13px;font-weight:700;line-height:1.3;}
+.order-row .meta{font-size:10px;color:var(--muted);margin-top:2px;}
+.order-row .price{font-family:'Fraunces',serif;font-weight:700;font-size:14px;color:var(--gold);white-space:nowrap;}
+.order-row .body{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.order-row select{font-size:11px;padding:4px 8px;border-radius:8px;border:1px solid var(--line);
+  background:var(--paper2);color:var(--ink);cursor:pointer;width:auto;min-width:130px;}
+.order-row .actions{display:flex;gap:6px;margin-left:auto;}
+.rev-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;
+  background:rgba(156,63,43,.18);color:var(--rust);}
+/* ---------- A2. Card depth (gradient + shadow bertingkat) ---------- */
+/* ---------- A2. Card depth ---------- */
+.card.note {
+  background: linear-gradient(180deg, #FFFBEB 0%, #FEF3C7 100%);
+  box-shadow: 0 1px 3px rgba(15,23,42,0.06), 0 4px 12px rgba(15,23,42,0.05),
+              inset 0 1px 0 rgba(255,255,255,0.7);
+}
+.card.link {
+  background: linear-gradient(180deg, #EFF6FF 0%, #DBEAFE 100%);
+  box-shadow: 0 1px 3px rgba(15,23,42,0.06), 0 4px 12px rgba(15,23,42,0.05),
+              inset 0 1px 0 rgba(255,255,255,0.7);
+}
+.card.image {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+  box-shadow: 0 1px 3px rgba(15,23,42,0.06), 0 6px 16px rgba(15,23,42,0.08),
+              inset 0 0 0 1px rgba(15,23,42,0.04);
+}
+.card.todo {
+  background: linear-gradient(180deg, #EEF2FF 0%, #E0E7FF 100%);
+  border-color: #C7D2FE;
+  box-shadow: 0 1px 3px rgba(15,23,42,0.06), 0 4px 12px rgba(15,23,42,0.05),
+              inset 0 1px 0 rgba(255,255,255,0.7);
+}
+.card.column {
+  background: linear-gradient(180deg, #ECFDF5 0%, #D1FAE5 100%);
+  border-color: #A7F3D0;
+  box-shadow: 0 1px 3px rgba(15,23,42,0.06), 0 4px 12px rgba(15,23,42,0.05),
+              inset 0 1px 0 rgba(255,255,255,0.7);
+}
+.card.color {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+  box-shadow: 0 1px 3px rgba(15,23,42,0.06), 0 4px 12px rgba(15,23,42,0.05),
+              inset 0 1px 0 rgba(255,255,255,0.7);
+}
+.card.boardlink {
+  background: linear-gradient(180deg, #FDF2F8 0%, #FCE7F3 100%);
+  border-color: #FBCFE8;
+  box-shadow: 0 1px 3px rgba(15,23,42,0.06), 0 4px 12px rgba(15,23,42,0.05),
+              inset 0 1px 0 rgba(255,255,255,0.7);
+}
+.card:hover {
+  box-shadow: 0 4px 10px rgba(15,23,42,0.08), 0 12px 28px rgba(15,23,42,0.10),
+              inset 0 1px 0 rgba(255,255,255,0.7) !important;
+}
+.card.dragging {
+  box-shadow: 0 8px 20px rgba(15,23,42,0.12), 0 24px 48px rgba(15,23,42,0.16) !important;
+}
+/* ---------- Dark mode polish ---------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .card.note {
+    background: linear-gradient(180deg, #FDE68A 0%, #FCD34D 100%);
+  }
+  :root:not([data-theme="light"]) .card.link {
+    background: linear-gradient(180deg, #93C5FD 0%, #60A5FA 100%);
+  }
+  :root:not([data-theme="light"]) .card.image {
+    background: linear-gradient(180deg, #E5E7EB 0%, #D1D5DB 100%);
+  }
+  :root:not([data-theme="light"]) .card.todo {
+    background: linear-gradient(180deg, #C7D2FE 0%, #A5B4FC 100%);
+    border-color: #818CF8;
+  }
+  :root:not([data-theme="light"]) .card.column {
+    background: linear-gradient(180deg, #A7F3D0 0%, #6EE7B7 100%);
+    border-color: #34D399;
+  }
+  :root:not([data-theme="light"]) .card.boardlink {
+    background: linear-gradient(180deg, #FBCFE8 0%, #F9A8D4 100%);
+    border-color: #F472B6;
+  }
+}
+:root[data-theme="dark"] .card.note {
+  background: linear-gradient(180deg, #FDE68A 0%, #FCD34D 100%);
+}
+:root[data-theme="dark"] .card.link {
+  background: linear-gradient(180deg, #93C5FD 0%, #60A5FA 100%);
+}
+:root[data-theme="dark"] .card.image {
+  background: linear-gradient(180deg, #E5E7EB 0%, #D1D5DB 100%);
+}
+:root[data-theme="dark"] .card.todo {
+  background: linear-gradient(180deg, #C7D2FE 0%, #A5B4FC 100%);
+  border-color: #818CF8;
+}
+:root[data-theme="dark"] .card.column {
+  background: linear-gradient(180deg, #A7F3D0 0%, #6EE7B7 100%);
+  border-color: #34D399;
+}
+:root[data-theme="dark"] .card.boardlink {
+  background: linear-gradient(180deg, #FBCFE8 0%, #F9A8D4 100%);
+  border-color: #F472B6;
+}
+
+/* ============================================================
+   THEME OVERRIDE — Cool Slate (final, high specificity)
+   ============================================================ */
+html:root {
+  color-scheme: light;
+  --canvas-bg: #F6F7F9 !important;
+  --canvas-dot: rgba(15, 23, 42, 0.06) !important;
+  --ui-panel: #1A1D24 !important;
+  --ui-panel-text: #E6EDF3 !important;
+  --ui-muted: #8B95A5 !important;
+  --ink: #0F172A !important;
+  --ink-soft: #64748B !important;
+  --accent: #3B82F6 !important;
+  --accent-text: #FFFFFF !important;
+  --paper-note: #FEF3C7 !important;
+  --paper-note-edge: #FDE68A !important;
+  --paper-link: #DBEAFE !important;
+  --paper-link-edge: #BFDBFE !important;
+  --paper-image: #FFFFFF !important;
+  --paper-image-edge: #E5E7EB !important;
+  --pin: #EF4444 !important;
+  --danger: #EF4444 !important;
+  --shadow: rgba(15, 23, 42, 0.08) !important;
+  --panel-row-hover: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Dark mode — TRUE slate black, bukan brown */
+@media (prefers-color-scheme: dark) {
+  html:root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --canvas-bg: #0D1117 !important;
+    --canvas-dot: rgba(148, 163, 184, 0.08) !important;
+    --ui-panel: #161B22 !important;
+    --ui-panel-text: #E6EDF3 !important;
+    --ui-muted: #6E7681 !important;
+    --accent: #58A6FF !important;
+    --accent-text: #0D1117 !important;
+    --paper-note: #FCD34D !important;
+    --paper-note-edge: #F59E0B !important;
+    --paper-link: #60A5FA !important;
+    --paper-link-edge: #3B82F6 !important;
+    --paper-image: #D1D5DB !important;
+    --paper-image-edge: #9CA3AF !important;
+    --pin: #F87171 !important;
+    --danger: #F87171 !important;
+    --shadow: rgba(0, 0, 0, 0.6) !important;
+    --panel-row-hover: rgba(255, 255, 255, 0.06) !important;
+  }
+}
+html:root[data-theme="dark"] {
+  color-scheme: dark;
+  --canvas-bg: #0D1117 !important;
+  --canvas-dot: rgba(148, 163, 184, 0.08) !important;
+  --ui-panel: #161B22 !important;
+  --ui-panel-text: #E6EDF3 !important;
+  --ui-muted: #6E7681 !important;
+  --accent: #58A6FF !important;
+  --accent-text: #0D1117 !important;
+  --paper-note: #FCD34D !important;
+  --paper-note-edge: #F59E0B !important;
+  --paper-link: #60A5FA !important;
+  --paper-link-edge: #3B82F6 !important;
+  --paper-image: #D1D5DB !important;
+  --paper-image-edge: #9CA3AF !important;
+  --pin: #F87171 !important;
+  --danger: #F87171 !important;
+  --shadow: rgba(0, 0, 0, 0.6) !important;
+  --panel-row-hover: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Override background body & canvas langsung (buat jaga-jaga) */
+html body {
+  background: var(--canvas-bg) !important;
+}
+#wrap {
+  background-color: var(--canvas-bg) !important;
+  background-image: radial-gradient(var(--canvas-dot) 1.4px, transparent 1.4px) !important;
+}
+#toolbar,
+#left-toolbar {
+  background: var(--ui-panel) !important;
+}
+
+/* Gradient kartu — match palet baru */
+.card.note {
+  background: linear-gradient(180deg, #FFFBEB 0%, #FEF3C7 100%) !important;
+}
+.card.link {
+  background: linear-gradient(180deg, #EFF6FF 0%, #DBEAFE 100%) !important;
+}
+.card.todo {
+  background: linear-gradient(180deg, #EEF2FF 0%, #E0E7FF 100%) !important;
+  border-color: #C7D2FE !important;
+}
+.card.column {
+  background: linear-gradient(180deg, #ECFDF5 0%, #D1FAE5 100%) !important;
+  border-color: #A7F3D0 !important;
+}
+.card.image, .card.color {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%) !important;
+}
+.card.boardlink {
+  background: linear-gradient(180deg, #FDF2F8 0%, #FCE7F3 100%) !important;
+  border-color: #FBCFE8 !important;
+}
+
+/* Dark mode — kartu versi lebih vivid */
+@media (prefers-color-scheme: dark) {
+  html:root:not([data-theme="light"]) .card.note {
+    background: linear-gradient(180deg, #FDE68A 0%, #FCD34D 100%) !important;
+  }
+  html:root:not([data-theme="light"]) .card.link {
+    background: linear-gradient(180deg, #93C5FD 0%, #60A5FA 100%) !important;
+  }
+  html:root:not([data-theme="light"]) .card.todo {
+    background: linear-gradient(180deg, #C7D2FE 0%, #A5B4FC 100%) !important;
+  }
+  html:root:not([data-theme="light"]) .card.column {
+    background: linear-gradient(180deg, #A7F3D0 0%, #6EE7B7 100%) !important;
+  }
+}
+html:root[data-theme="dark"] .card.note {
+  background: linear-gradient(180deg, #FDE68A 0%, #FCD34D 100%) !important;
+}
+html:root[data-theme="dark"] .card.link {
+  background: linear-gradient(180deg, #93C5FD 0%, #60A5FA 100%) !important;
+}
+html:root[data-theme="dark"] .card.todo {
+  background: linear-gradient(180deg, #C7D2FE 0%, #A5B4FC 100%) !important;
+}
+html:root[data-theme="dark"] .card.column {
+  background: linear-gradient(180deg, #A7F3D0 0%, #6EE7B7 100%) !important;
+}
+
 </style>
 </head>
 <body class="min-h-screen pb-24 lg:pb-6">
@@ -200,7 +660,9 @@ label{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;disp
     <div class="flex items-center gap-3 min-w-0">
       <label class="cursor-pointer block shrink-0" title="Klik untuk unggah logo (opsional)">
         <input type="file" id="logoInput" accept="image/*" class="hidden"/>
-        <div id="logoPlaceholder" class="w-10 h-10 rounded-full flex items-center justify-center text-sm" style="background:var(--gold);color:#241B08">🧵</div>
+        <div id="logoPlaceholder" class="w-10 h-10 rounded-full flex items-center justify-center" style="background:var(--gold);color:#241B08">
+  <i data-lucide="scissors" style="width:20px;height:20px"></i>
+</div>
         <img id="logoPreview" class="w-10 h-10 rounded-full object-cover hidden" alt="Logo"/>
       </label>
       <div class="min-w-0">
@@ -216,9 +678,9 @@ label{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;disp
       </div>
     </div>
     <div class="flex items-center gap-2 shrink-0">
-      <button id="themeToggle" class="theme-btn" title="Ganti tema terang/gelap">🌙</button>
+      <button id="themeToggle" class="theme-btn" title="Ganti tema terang/gelap"><i data-lucide="moon" style="width:18px;height:18px"></i></button>
       <button id="resetAllBtn" class="text-xs px-3 py-1.5 rounded-lg border transition-colors"
-        style="color:#CFC6AE;border-color:#3A4048">↺ Reset</button>
+        style="color:#CFC6AE;border-color:#3A4048"><i data-lucide="rotate-ccw" style="width:14px;height:14px;display:inline-block;vertical-align:-2px;margin-right:5px"></i>Reset</button>
     </div>
   </div>
   <svg class="stitch" viewBox="0 0 400 14" preserveAspectRatio="none"><path d="M0 7 Q10 0 20 7 T40 7 T60 7 T80 7 T100 7 T120 7 T140 7 T160 7 T180 7 T200 7 T220 7 T240 7 T260 7 T280 7 T300 7 T320 7 T340 7 T360 7 T380 7 T400 7" fill="none" stroke="#C4933B" stroke-width="1.5" opacity=".6"/></svg>
@@ -232,8 +694,12 @@ label{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;disp
     <div id="exportArea" class="acc p-4 sm:p-5" style="border-radius:16px 4px 16px 16px">
       <div id="previewCard">
         <div class="flex gap-1 -mb-px">
-          <button id="tab2d" class="view-tab active">🖼 Mockup 2D</button>
-          <button id="tab3d" class="view-tab">🧊 Tampilan 3D</button>
+          <button id="tab2d" class="view-tab active">
+  <i data-lucide="image" style="width:14px;height:14px;display:inline-block;vertical-align:-2px;margin-right:4px"></i>Mockup 2D
+</button>
+        <button id="tab3d" class="view-tab">
+          <i data-lucide="box" style="width:14px;height:14px;display:inline-block;vertical-align:-2px;margin-right:4px"></i>Tampilan 3D
+        </button>
         </div>
         <div id="mockupWrap" class="w-full rounded-b-xl flex items-center justify-center p-6 sm:p-9 min-h-[240px]">
           <div id="carpetShape" class="empty" style="width:80%;aspect-ratio:4/3;border-radius:8px;">
@@ -245,10 +711,13 @@ label{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;disp
           <div id="threeSkeleton" class="hidden"><div class="text-center"><span class="spinner"></span><p class="text-xs mt-3" style="color:var(--muted)">Menyiapkan tampilan 3D…</p></div></div>
           <div id="threeCanvasHost"></div>
           <span id="threeHint">Seret untuk memutar • cubit untuk zoom</span>
-          <button id="download3dBtn" class="btn btn-mini btn-gold" style="position:absolute;top:8px;right:8px;">⬇ .glb</button>
+          <button id="download3dBtn" class="btn btn-mini btn-gold" style="position:absolute;top:8px;right:8px;"><i data-lucide="download" style="width:12px;height:12px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>.glb</button>
         </div>
       </div>
-      <p class="text-[11px] mt-2 text-center" style="color:var(--muted)">💡 Seret gambar untuk menggeser posisi motif</p>
+            <div class="flex items-center justify-center gap-2 mt-2 flex-wrap">
+        <p class="text-[11px]" style="color:var(--muted)"><i data-lucide="lightbulb" style="width:12px;height:12px;display:inline-block;vertical-align:-2px;margin-right:4px"></i>Seret gambar untuk menggeser posisi motif</p>
+        <button id="downloadCarpetBtn" class="btn btn-mini btn-gold" style="font-size:10px;padding:4px 10px;min-height:auto">	<i data-lucide="download" style="width:12px;height:12px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>PNG Karpet</button>
+      </div>
 
       <div class="price-card mt-5 p-4 space-y-1.5 text-sm">
         <div class="flex justify-between"><span class="opacity-70">Ukuran</span><span id="sumSize" class="font-semibold tabular">200 × 150 cm</span></div>
@@ -267,9 +736,15 @@ label{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;disp
     </div>
 
     <div class="hidden lg:grid grid-cols-3 gap-2.5">
-      <button id="quoteBtn" class="btn btn-dark">🧾 Ringkasan</button>
-      <button id="downloadBtn" class="btn btn-ghost">⬇ Unduh</button>
-      <button id="waBtn" class="btn btn-wa">✆ WhatsApp</button>
+      <button id="quoteBtn" class="btn btn-dark">
+  <i data-lucide="file-text" style="width:16px;height:16px;display:inline-block;vertical-align:-3px;margin-right:6px"></i>Ringkasan
+        </button>
+        <button id="downloadBtn" class="btn btn-ghost">
+          <i data-lucide="download" style="width:16px;height:16px;display:inline-block;vertical-align:-3px;margin-right:6px"></i>Unduh
+        </button>
+        <button id="waBtn" class="btn btn-wa">
+          <i data-lucide="message-circle" style="width:16px;height:16px;display:inline-block;vertical-align:-3px;margin-right:6px"></i>WhatsApp
+        </button>
     </div>
   </div>
 </main>
@@ -282,9 +757,9 @@ label{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;disp
     <p id="stickyTotal" class="serif font-bold text-lg tabular" style="color:var(--gold)">Rp 0</p>
   </div>
   <div class="flex gap-2 shrink-0">
-    <button id="quoteBtnM" class="btn btn-mini btn-ghost" style="border-color:#4A4130;color:var(--chrome-fg);background:transparent">🧾</button>
-    <button id="downloadBtnM" class="btn btn-mini btn-ghost" style="border-color:#4A4130;color:var(--chrome-fg);background:transparent">⬇</button>
-    <button id="waBtnM" class="btn btn-mini btn-wa">✆ WA</button>
+    <button id="quoteBtnM" class="btn btn-mini btn-ghost" style="border-color:#4A4130;color:var(--chrome-fg);background:transparent"><i data-lucide="file-text" style="width:16px;height:16px"></i></button>
+    <button id="downloadBtnM" class="btn btn-mini btn-ghost" style="border-color:#4A4130;color:var(--chrome-fg);background:transparent"><i data-lucide="download" style="width:16px;height:16px"></i></button>
+    <button id="waBtnM" class="btn btn-mini btn-wa"><i data-lucide="message-circle" style="width:14px;height:14px;display:inline-block;vertical-align:-3px;margin-right:4px"></i>WA</button>
   </div>
 </div>
 
@@ -292,7 +767,7 @@ label{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;disp
   <div class="w-full max-w-sm max-h-[92vh] overflow-y-auto">
     <div id="quoteCard" class="acc p-5" style="background:var(--paper2)">
       <div class="flex items-center gap-3 mb-5">
-  <div id="quoteLogoWrap" class="w-10 h-10 rounded-full shrink-0 flex items-center justify-center text-xs" style="background:var(--gold)">🧵</div>
+  <div id="quoteLogoWrap" class="w-10 h-10 rounded-full shrink-0 flex items-center justify-center text-xs" style="background:var(--gold)"><i data-lucide="scissors" style="width:18px;height:18px"></i></div>
   <div class="min-w-0 flex-1">
     <p id="quoteBrand" class="serif font-semibold text-base truncate" style="line-height:1.3">Rangkai Karpet Studio</p>
     <p id="quoteModalTitle" class="text-[10px] tracking-wide uppercase mt-0.5" style="color:var(--muted)">Ringkasan Penawaran</p>
@@ -346,12 +821,13 @@ label{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;disp
 </div>
 
 <p id="quoteDate" class="text-[10px] mt-4 text-center" style="color:var(--muted)"></p>
+
     </div>
     <div class="grid grid-cols-4 gap-2 mt-3 no-print">
-      <button id="quotePdfBtn" class="btn btn-ghost text-xs">🖨 PDF</button>
-      <button id="quoteDownloadBtn" class="btn btn-gold text-xs">⬇ PNG</button>
-      <button id="quoteWaBtn" class="btn btn-wa text-xs">✆ WA</button>
-      <button id="quoteCloseBtn" class="btn btn-ghost text-xs">✕ Tutup</button>
+      <button id="quotePdfBtn" class="btn btn-ghost text-xs"><i data-lucide="printer" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>PDF</button>
+      <button id="quoteDownloadBtn" class="btn btn-gold text-xs"><i data-lucide="download" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>PNG</button>
+      <button id="quoteWaBtn" class="btn btn-wa text-xs"><i data-lucide="message-circle" style="width:13px;height:13px;display:inline-block;vertical-align:-3px;margin-right:3px"></i>WA</button>
+      <button id="quoteCloseBtn" class="btn btn-ghost text-xs"><i data-lucide="x" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>Tutup</button>
     </div>
   </div>
 </div>
@@ -361,7 +837,7 @@ label{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;disp
   <div class="w-full max-w-md max-h-[95vh] overflow-y-auto acc p-4" style="background:var(--paper2)">
     <div class="flex items-center justify-between mb-3">
       <div>
-        <p class="serif font-semibold text-base">📱 Preview Pesan WhatsApp</p>
+        <p class="serif font-semibold text-base"><i data-lucide="smartphone" style="width:16px;height:16px;display:inline-block;vertical-align:-3px;margin-right:6px"></i>Preview Pesan WhatsApp</p>
         <p class="text-[11px]" style="color:var(--muted)">Periksa & edit sebelum dikirim</p>
       </div>
       <button id="waPreviewCloseBtn" class="hpp-action-btn" title="Tutup">✕</button>
@@ -380,12 +856,12 @@ label{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;disp
     <p id="waPreviewHint" class="text-[10px] mb-3 p-2 rounded" style="color:var(--muted);background:var(--paper)"></p>
 
     <div class="grid grid-cols-2 gap-2 mb-2">
-      <button id="waPreviewCopyBtn" class="btn btn-ghost text-xs">📋 Salin Teks</button>
-      <button id="waPreviewCopyImgBtn" class="btn btn-ghost text-xs">🖼 Salin Gambar</button>
+      <button id="waPreviewCopyBtn" class="btn btn-ghost text-xs"><i data-lucide="clipboard-copy" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>Salin Teks</button>
+      <button id="waPreviewCopyImgBtn" class="btn btn-ghost text-xs"><i data-lucide="image" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>Salin Gambar</button>
     </div>
     <div class="grid grid-cols-2 gap-2">
       <button id="waPreviewCancelBtn" class="btn btn-ghost text-xs">Batal</button>
-      <button id="waPreviewSendBtn" class="btn btn-wa text-xs">✆ Kirim ke WhatsApp</button>
+      <button id="waPreviewSendBtn" class="btn btn-wa text-xs"><i data-lucide="send" style="width:13px;height:13px;display:inline-block;vertical-align:-3px;margin-right:3px"></i>Kirim ke WhatsApp</button>
     </div>
   </div>
 </div>
@@ -393,7 +869,7 @@ label{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;disp
 <!-- ADMIN LOGIN MODAL -->
 <div id="loginModal" class="hidden fixed inset-0 z-50 items-center justify-center p-4" role="dialog" aria-modal="true" style="background:rgba(20,16,10,.6)">
   <div class="w-full max-w-sm acc p-5" style="background:var(--paper2)">
-    <p class="serif font-semibold text-base mb-1">🔐 Masuk sebagai Admin</p>
+    <p class="serif font-semibold text-base mb-1"><i data-lucide="lock" style="width:16px;height:16px;display:inline-block;vertical-align:-3px;margin-right:6px"></i>Masuk sebagai Admin</p>
     <p class="text-xs mb-4" style="color:var(--muted)">Diperlukan untuk membuat link klien. Akun dibuat manual lewat dashboard Supabase (Authentication → Users) — tidak ada pendaftaran terbuka.</p>
     <div class="space-y-3">
       <div><label for="loginEmail">Email</label><input type="text" id="loginEmail" autocomplete="username"/></div>
@@ -430,7 +906,7 @@ label{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;disp
       </div>
     </div>
     <div class="grid grid-cols-2 gap-2 mt-4">
-      <button id="detailLoadBtn" class="btn btn-gold text-xs">↻ Muat ke Kalkulator</button>
+      <button id="detailLoadBtn" class="btn btn-gold text-xs"><i data-lucide="rotate-cw" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>Muat ke Kalkulator</button>
       <button id="detailCloseBtn" class="btn btn-ghost text-xs">✕ Tutup</button>
     </div>
   </div>
@@ -450,7 +926,7 @@ label{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;disp
 <!-- LINK KLIEN MODAL -->
 <div id="linkModal" class="hidden fixed inset-0 z-50 items-center justify-center p-4" role="dialog" aria-modal="true" style="background:rgba(20,16,10,.6)">
   <div class="w-full max-w-sm acc p-5" style="background:var(--paper2)">
-    <p class="serif font-semibold text-base mb-1">🔗 Link Klien Siap</p>
+    <p class="serif font-semibold text-base mb-1"><i data-lucide="link" style="width:16px;height:16px;display:inline-block;vertical-align:-3px;margin-right:6px"></i>Link Klien Siap</p>
     <p class="text-xs mb-4" style="color:var(--muted)">Kirim link ini ke klien. Mereka hanya bisa melihat mockup, ukuran, dan harga jual akhir.</p>
     <div class="flex items-center gap-2 mb-4">
       <input id="linkOutput" type="text" readonly class="text-xs" style="background:var(--paper)"/>
@@ -463,11 +939,40 @@ label{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;disp
 
 <!-- CLIENT-MODE NOTICE -->
 <div id="clientInfoCard" class="hidden acc p-5 mb-3">
-  <p class="serif font-semibold text-base mb-1">👋 Halo!</p>
+  <p class="serif font-semibold text-base mb-1"><i data-lucide="hand" style="width:16px;height:16px;display:inline-block;vertical-align:-3px;margin-right:6px"></i>Halo!</p>
   <p id="clientInfoText" class="text-sm" style="color:var(--muted)">Memuat detail pesanan Anda…</p>
   <p id="clientOrderNum" class="text-xs mt-2 tabular" style="color:var(--muted)"></p>
   <span id="clientStatusBadge" class="status-badge hidden mt-2 inline-block"></span>
-  <button id="clientConfirmBtn" class="btn btn-dark w-full text-sm mt-3 hidden">✅ Konfirmasi Pesanan Ini</button>
+<p id="clientExpiryInfo" class="text-[10px] mt-1" style="color:var(--muted)"></p>
+  <p id="clientExpiryInfo" class="text-[10px] mt-1" style="color:var(--muted)"></p>
+  <div id="clientProgress" class="mt-3">
+  <div class="flex justify-between text-[10px] mb-1" style="color:var(--muted)">
+    <span id="cpStep1">Menunggu</span>
+    <span id="cpStep2">Konfirmasi</span>
+    <span id="cpStep3">Produksi</span>
+    <span id="cpStep4">Selesai</span>
+  </div>
+  <button id="clientPrintBtn" class="btn btn-ghost w-full text-xs mt-2"><i data-lucide="printer" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:4px"></i>Simpan sebagai PDF</button>
+  <button id="clientRevisionBtn" class="btn btn-gold w-full text-sm mt-2"><i data-lucide="upload" style="width:14px;height:14px;display:inline-block;vertical-align:-3px;margin-right:5px"></i>Kirim Gambar Baru / Minta Revisi</button>
+  <div class="h-1.5 rounded-full overflow-hidden" style="background:var(--line)">
+    <div id="cpBar" class="h-full rounded-full transition-all" style="width:0%;background:var(--ok)"></div>
+  </div>
+</div>
+  <button id="clientConfirmBtn" class="btn btn-dark w-full text-sm mt-3 hidden"><i data-lucide="check-circle-2" style="width:14px;height:14px;display:inline-block;vertical-align:-3px;margin-right:5px"></i>Konfirmasi Pesanan Ini</button>
+</div>
+<div id="revisionModal" class="hidden fixed inset-0 z-50 items-center justify-center p-4" role="dialog" style="background:rgba(20,16,10,.6)">
+  <div class="w-full max-w-sm acc p-5" style="background:var(--paper2)">
+    <p class="serif font-semibold text-base mb-3"><i data-lucide="refresh-cw" style="width:16px;height:16px;display:inline-block;vertical-align:-3px;margin-right:6px"></i>Ajukan Revisi Desain</p>
+    <label for="revNote">Catatan (opsional)</label>
+    <textarea id="revNote" rows="2" class="w-full text-sm mb-3" placeholder="cth: Ganti warna jadi biru, motif diperbesar..."></textarea>
+    <label>Gambar baru (wajib kalau mau ganti desain)</label>
+    <input type="file" id="revImageInput" accept="image/*" class="mb-3 text-xs"/>
+    <img id="revImagePreview" class="hidden w-full rounded-lg mb-3" style="max-height:180px;object-fit:cover"/>
+    <div class="grid grid-cols-2 gap-2">
+      <button id="revCancelBtn" class="btn btn-ghost text-xs">Batal</button>
+      <button id="revSubmitBtn" class="btn btn-gold text-xs">Kirim</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -475,8 +980,8 @@ label{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;disp
    Ganti dua nilai di bawah dengan Project URL & anon public key dari
    dashboard Supabase kamu (Settings > API). Sebelum itu, jalankan SQL
    skema tabel "orders" yang saya berikan di percakapan terpisah. */
-const SUPABASE_URL='YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY='YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_URL='https://nqajhuekiexmvwosobkm.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_X1zcxFM2QI_kv_uZi3r0-w_YGQkF0Df';
 const supabaseReady=SUPABASE_URL.startsWith('http')&&SUPABASE_ANON_KEY&&SUPABASE_ANON_KEY!=='YOUR_SUPABASE_ANON_KEY';
 const sb=supabaseReady?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
 
@@ -497,8 +1002,8 @@ if ('serviceWorker' in navigator) {
 
 /* ============ MODE DETECTION ============ */
 const urlParams=new URLSearchParams(location.search);
-const orderParam=urlParams.get('pesanan');
-const isClientMode=!!orderParam;
+const clientToken=urlParams.get('t');         // token acak
+const isClientMode=!!clientToken;
 
 /* ============ CONFIRM DIALOG (ganti window.confirm) ============ */
 let pendingConfirmResolve=null;
@@ -511,12 +1016,7 @@ function confirmDialog(message){
   });
 }
 
-/* ============ ADMIN AUTH GATE ============
-   Proteksi nyata ada di kebijakan RLS Supabase (INSERT hanya untuk role
-   "authenticated"), bukan di JavaScript ini — modal login di bawah hanya
-   membantu admin mendapatkan sesi login yang sah. Buat akun admin secara
-   manual lewat Supabase Dashboard > Authentication > Users (jangan buka
-   pendaftaran publik). */
+/* ============ ADMIN AUTH GATE ============ */
 let pendingAuthResolve=null;
 function showLoginModal(){
   loginError.classList.add('hidden');loginEmail.value='';loginPassword.value='';
@@ -540,6 +1040,7 @@ const themeToggle=$('themeToggle');
 function effectiveTheme(){
   return document.documentElement.dataset.theme || (window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
 }
+
 function updateThemeIcon(){themeToggle.textContent=effectiveTheme()==='dark'?'☀️':'🌙';}
 (function initTheme(){
   try{const saved=localStorage.getItem('karpet-theme');if(saved)document.documentElement.dataset.theme=saved;}catch(e){}
@@ -552,6 +1053,44 @@ themeToggle.addEventListener('click',()=>{
   updateThemeIcon();
   if(typeof scene!=='undefined'&&scene)scene.background=new THREE.Color(getComputedStyle(document.body).getPropertyValue('--scenebg')||'#e9e2d0');
 });
+/* ============ REVISI KLIEN ============ */
+let revImageData=null;
+document.getElementById('clientRevisionBtn')?.addEventListener('click',()=>{
+  revImageData=null;
+  document.getElementById('revNote').value='';
+  document.getElementById('revImageInput').value='';
+  document.getElementById('revImagePreview').classList.add('hidden');
+  document.getElementById('revisionModal').classList.remove('hidden');
+  document.getElementById('revisionModal').classList.add('flex');
+});
+document.getElementById('revCancelBtn')?.addEventListener('click',()=>{
+  document.getElementById('revisionModal').classList.add('hidden');
+  document.getElementById('revisionModal').classList.remove('flex');
+});
+document.getElementById('revImageInput')?.addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=async ev=>{
+    revImageData=await prepareImageForStorage(ev.target.result,1200);
+    const img=document.getElementById('revImagePreview');
+    img.src=revImageData;img.classList.remove('hidden');
+  };
+  r.readAsDataURL(f);
+});
+document.getElementById('revSubmitBtn')?.addEventListener('click',async()=>{
+  const note=document.getElementById('revNote').value.trim();
+  if(!note&&!revImageData){toast('Isi catatan atau unggah gambar dulu.','warn');return;}
+  const btn=document.getElementById('revSubmitBtn');
+  withLoading(btn,'Mengirim…',async()=>{
+    const{error}=await sb.rpc('client_request_revision',{
+      p_token:clientToken,p_note:note||null,p_image:revImageData||null
+    });
+    if(error){toast('Gagal kirim revisi: '+error.message,'warn',4800);return;}
+    toast('Gambar berhasil dikirim! Kami akan segera proses.','ok',5000);
+    clientInfoText.textContent='✅ Gambar baru sudah kami terima. Kami akan segera menghubungi Anda bila ada update.';
+    document.getElementById('revCancelBtn').click();
+  });
+});
 
 /* ============ STEP CONTENT TEMPLATES ============ */
 const steps=[
@@ -559,7 +1098,7 @@ const steps=[
   <label for="fileInput">Unggah gambar desain / motif</label>
   <input type="file" id="fileInput" accept="image/*" class="hidden"/>
   <div id="dropZone" class="rounded-xl border-2 border-dashed text-center p-6 cursor-pointer transition-colors" style="border-color:var(--line)">
-    <p class="text-2xl mb-1">🖼️</p>
+    <p class="text-2xl mb-1"><div class="flex justify-center mb-1"><i data-lucide="image" style="width:28px;height:28px;color:var(--muted)"></i></div>
     <p class="text-xs font-semibold">Tap untuk pilih, atau seret gambar ke sini</p>
     <p class="text-[10px] mt-1" style="color:var(--muted)">JPG/PNG, otomatis dikecilkan kalau terlalu besar</p>
   </div>
@@ -573,16 +1112,16 @@ const steps=[
       <input type="range" id="imgZoomRange" min="30" max="300" value="100" class="w-full" style="accent-color:var(--thread)"/>
     </div>
         <div class="grid grid-cols-2 gap-2">
-      <button id="resetImgBtn" class="btn btn-ghost w-full text-xs">↺ Reset Posisi</button>
-      <button id="deleteImgBtn" class="btn w-full text-xs" style="background:var(--rust);color:#fff">🗑 Hapus</button>
+      <button id="resetImgBtn" class="btn btn-ghost w-full text-xs"><i data-lucide="rotate-ccw" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>Reset Posisi</button>
+      <button id="deleteImgBtn" class="btn w-full text-xs" style="background:var(--rust);color:#fff"><i data-lucide="trash-2" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>Hapus</button>
     </div>
   </div>
   <div id="bgPanel" class="mt-4 pt-4 border-t" style="border-color:var(--line)">
     <label>Latar Belakang Karpet (opsional)</label>
     <div class="grid grid-cols-3 gap-2 mb-3">
-      <button type="button" class="shape-btn bg-opt active" data-bg="transparent">⬜ Transparan</button>
-      <button type="button" class="shape-btn bg-opt" data-bg="color">🎨 Warna</button>
-      <button type="button" class="shape-btn bg-opt" data-bg="image">🖼 Gambar</button>
+      <button type="button" class="shape-btn bg-opt active" data-bg="transparent"><i data-lucide="square" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>Transparan</button>
+      <button type="button" class="shape-btn bg-opt" data-bg="color"><i data-lucide="palette" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>Warna</button>
+      <button type="button" class="shape-btn bg-opt" data-bg="image"><i data-lucide="image" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>Gambar</button>
     </div>
     <div id="bgColorPanel" class="hidden">
   <label>Pilih Warna Latar</label>
@@ -619,12 +1158,12 @@ const steps=[
     <div id="bgImagePanel" class="hidden">
       <input type="file" id="bgImageInput" accept="image/*" class="hidden"/>
       <div id="bgDropZone" class="rounded-xl border-2 border-dashed text-center p-4 cursor-pointer transition-colors" style="border-color:var(--line)">
-        <p class="text-2xl mb-1">🖼️</p>
+        <div class="flex justify-center mb-1"><i data-lucide="image" style="width:28px;height:28px;color:var(--muted)"></i></div>
         <p class="text-xs font-semibold">Tap untuk pilih gambar latar</p>
         <p class="text-[10px] mt-1" style="color:var(--muted)">Akan di-scale otomatis untuk mengisi karpet</p>
       </div>
       <p id="bgFileName" class="text-xs mt-2" style="color:var(--muted)">Belum ada gambar latar.</p>
-      <button id="delBgImgBtn" class="btn w-full text-xs mt-2 hidden" style="background:var(--rust);color:#fff">🗑 Hapus Gambar Latar</button>
+      <button id="delBgImgBtn" class="btn w-full text-xs mt-2 hidden" style="background:var(--rust);color:#fff"><i data-lucide="trash-2" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>Hapus Gambar Latar</button>
     </div>
   </div>`},
 {n:2,title:'Ukuran & Bentuk',body:`
@@ -661,6 +1200,17 @@ const steps=[
       <span>HPP per m²</span>
       <span id="hppPerM2El" class="tabular">Rp 0</span>
     </div>
+  </div>
+
+  <div class="mt-5 pt-4 border-t" style="border-color:var(--line)">
+    <p class="text-xs font-semibold mb-2" style="color:var(--muted)">
+  <i data-lucide="save" style="width:12px;height:12px;display:inline-block;vertical-align:-2px;margin-right:4px"></i>Preset Komponen
+</p>
+    <div class="flex gap-2 mb-2">
+      <input type="text" id="presetNameInput" placeholder="Nama preset (cth: Karpet Premium)" class="flex-1"/>
+      <button id="savePresetBtn" class="btn btn-gold btn-mini whitespace-nowrap">Simpan</button>
+    </div>
+    <div id="presetListEl" class="text-xs" style="color:var(--muted)">Belum ada preset tersimpan.</div>
   </div>`},
 {n:4,title:'Margin & Harga Jual',body:`
   <div class="flex items-center justify-between p-3 mb-3 rounded-lg" style="background:var(--paper)">
@@ -735,45 +1285,51 @@ const steps=[
     placeholder="cth: Harga belum termasuk ongkir luar kota"></textarea>
 </div>
     </div>
-    <button id="regenQuoteNumBtn" class="btn btn-ghost w-full text-xs">↻ Generate Ulang No. Penawaran</button>
+    <button id="regenQuoteNumBtn" class="btn btn-ghost w-full text-xs"><i data-lucide="refresh-cw" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:4px"></i>Generate Ulang No. Penawaran</button>
     <div class="pt-3 mt-3 border-t" style="border-color:var(--line)">
-      <button id="createLinkBtn" class="btn btn-gold w-full text-sm">🔗 Buat Link Klien</button>
+      <button id="createLinkBtn" class="btn btn-gold w-full text-sm"><i data-lucide="link" style="width:14px;height:14px;display:inline-block;vertical-align:-3px;margin-right:5px"></i>Buat Link Klien</button>
       <p class="text-[10px] mt-2" style="color:var(--muted)">Klien hanya akan melihat mockup, ukuran, dan harga jual akhir — tanpa rincian HPP atau margin. Login admin diminta otomatis saat dibutuhkan.</p>
       <p id="adminAuthStatus" class="text-[10px] mt-2 hidden" style="color:var(--muted)">Masuk sebagai <span id="adminAuthEmail" class="font-semibold"></span> · <button id="logoutBtn" class="underline">Keluar</button></p>
     </div>
   </div>`},
-{n:7,title:'Preset & Riwayat',body:`
-  <div class="mb-4">
-    <p class="text-xs font-semibold mb-2" style="color:var(--muted)">💾 Preset Komponen Biaya</p>
-    <div class="flex gap-2 mb-2">
-      <input type="text" id="presetNameInput" placeholder="Nama preset (cth: Karpet Premium)" class="flex-1"/>
-      <button id="savePresetBtn" class="btn btn-gold btn-mini whitespace-nowrap">Simpan</button>
+{n:7,title:'Riwayat Pesanan',body:`
+  <div class="stats-grid">
+    <div class="stat-card">
+      <p id="statOmzet" class="stat-value">Rp 0</p>
+      <p class="stat-label">Omzet bulan ini</p>
     </div>
-    <div id="presetListEl" class="text-xs" style="color:var(--muted)">Belum ada preset tersimpan.</div>
-  </div>
-  <div class="pt-3 border-t" style="border-color:var(--line)">
-    <p class="text-xs font-semibold mb-2" style="color:var(--muted)">📚 Riwayat Penawaran (20 terakhir)</p>
-    <input type="text" id="historySearchInput" placeholder="Cari nama klien / no. penawaran…" class="mb-2 text-xs"/>
-    <div id="historyListEl" class="text-xs" style="color:var(--muted)">Belum ada riwayat.</div>
-  </div>`},
-{n:8,title:'Dashboard Pesanan Cloud',body:`
-  <div class="grid grid-cols-3 gap-2 mb-4">
-    <div class="rounded-lg p-2.5 text-center" style="background:var(--paper)">
-      <p id="dashOmzet" class="serif font-bold text-sm tabular">Rp 0</p><p class="text-[10px]" style="color:var(--muted)">Omzet bulan ini</p>
+    <div class="stat-card">
+      <p id="statTotal" class="stat-value">0</p>
+      <p class="stat-label">Total pesanan</p>
     </div>
-    <div class="rounded-lg p-2.5 text-center" style="background:var(--paper)">
-      <p id="dashConfirmed" class="serif font-bold text-sm tabular">0</p><p class="text-[10px]" style="color:var(--muted)">Dikonfirmasi</p>
+    <div class="stat-card">
+      <p id="statPending" class="stat-value">0</p>
+      <p class="stat-label">Menunggu</p>
     </div>
-    <div class="rounded-lg p-2.5 text-center" style="background:var(--paper)">
-      <p id="dashPending" class="serif font-bold text-sm tabular">0</p><p class="text-[10px]" style="color:var(--muted)">Menunggu</p>
+    <div class="stat-card">
+      <p id="statDone" class="stat-value">0</p>
+      <p class="stat-label">Selesai</p>
     </div>
   </div>
-  <div class="grid grid-cols-2 gap-2 mb-3">
-    <button id="dashRefreshBtn" class="btn btn-ghost text-xs">↻ Muat Ulang</button>
-    <button id="dashExportBtn" class="btn btn-ghost text-xs">⬇ Ekspor CSV</button>
+
+  <div class="filter-tabs" id="filterTabs">
+    <button class="filter-tab active" data-filter="all">Semua</button>
+    <button class="filter-tab" data-filter="menunggu"><i data-lucide="clock" style="width:12px;height:12px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>Menunggu</button>
+    <button class="filter-tab" data-filter="dikonfirmasi"><i data-lucide="check-circle-2" style="width:12px;height:12px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>Dikonfirmasi</button>
+    <button class="filter-tab" data-filter="proses"><i data-lucide="wrench" style="width:12px;height:12px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>Proses</button>
+    <button class="filter-tab" data-filter="selesai"><i data-lucide="party-popper" style="width:12px;height:12px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>Selesai</button>
   </div>
-  <input type="text" id="dashSearchInput" placeholder="Cari nama klien / no. pesanan…" class="mb-2 text-xs"/>
-  <div id="dashListEl" class="text-xs space-y-1.5" style="color:var(--muted)">Tekan "Muat Ulang" untuk melihat pesanan.</div>`}
+
+  <input type="text" id="dashSearchInput" placeholder=" Cari nama klien / no. pesanan…" class="mb-3 text-xs"/>
+
+  <div class="grid grid-cols-3 gap-2 mb-3">
+    <button id="dashRefreshBtn" class="btn btn-ghost text-xs"><i data-lucide="refresh-cw" style="width:12px;height:12px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>Refresh</button>
+    <button id="dashExportBtn" class="btn btn-ghost text-xs"><i data-lucide="download" style="width:12px;height:12px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>⬇ CSV</button>
+    <button id="dashLoginBtn" class="btn btn-ghost text-xs"><i data-lucide="lock" style="width:12px;height:12px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>Login</button>
+  </div>
+
+  <div id="dashListEl" class="text-xs space-y-2" style="color:var(--muted)">Tekan "Refresh" untuk melihat pesanan.</div>
+`}
 ];
 $('accWrap').innerHTML=steps.map((s,i)=>`
   <div class="acc${i===0?' open':''}" data-acc="${s.n}">
@@ -788,7 +1344,7 @@ document.querySelectorAll('[data-toggle]').forEach(btn=>btn.addEventListener('cl
   const item=btn.closest('.acc'),open=item.classList.toggle('open');
   btn.setAttribute('aria-expanded',open);
 }));
-
+renderIcons();
 /* ============ DOM REFS ============ */
 const fileInput=$('fileInput'),uploadBtn=$('uploadBtn'),fileName=$('fileName'),
 carpetShape=$('carpetShape'),lengthInput=$('lengthInput'),widthInput=$('widthInput'),
@@ -845,7 +1401,7 @@ confirmCancelBtn=$('confirmCancelBtn'),confirmOkBtn=$('confirmOkBtn'),
 accWrap=$('accWrap');
 
 /* ============ CONSTANTS ============ */
-const STORAGE_KEY='karpet-studio-v3',PRESET_KEY='karpet-presets-v3',HISTORY_KEY='karpet-history-v3';
+const STORAGE_KEY='karpet-studio-v3',PRESET_KEY='karpet-presets-v3';
 const shapeLabels={rect:'Persegi Panjang',circle:'Lingkaran',runner:'Runner / Lorong',custom:'Custom (Siluet PNG)'};
 const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -855,9 +1411,9 @@ let imgScale=1,imgOffX=0,imgOffY=0,currentAreaM2=0,currentSizeText='';
 let imgVersion=0,lastUnit=unitSelect.value,currentShape='rect',logoDataUrl=null;
 let bgType='transparent',bgColor='#F3EEDF',bgImageData=null,bgImageName='',bgImgObj=null;
 const HPP_GROUPS=[
-  {key:'bahan',label:'🧶 Bahan Baku'},
-  {key:'jasa',label:'🔧 Jasa & Operasional'},
-  {key:'lain',label:'📦 Lain-lain'}
+  {key:'bahan',label:'Bahan Baku'},
+  {key:'jasa',label:'Jasa & Operasional'},
+  {key:'lain',label:'Lain-lain'}
 ];
 let hppNextId=6,hppRows=[
   {id:1,name:'Benang Akrilik',qty:0,unit:'kg',price:95000,linked:true,perM2:1.10,category:'bahan'},
@@ -1066,6 +1622,7 @@ function renderHppRows(){
         </div>
       </div>`;
   }).join('');
+  renderIcons();
 }
 
 function renderHppCard(r,total){
@@ -1084,8 +1641,8 @@ function renderHppCard(r,total){
           data-field="name" data-id="${r.id}" 
           value="${esc(r.name)}" 
           placeholder="Nama komponen"/>
-        <button type="button" class="hpp-action-btn" data-action="dup" data-id="${r.id}" title="Duplikat">⧉</button>
-        <button type="button" class="hpp-action-btn hpp-action-del" data-action="del" data-id="${r.id}" title="Hapus">✕</button>
+        <button type="button" class="hpp-action-btn" data-action="dup" data-id="${r.id}" title="Duplikat"><i data-lucide="copy" style="width:12px;height:12px"></i></button>
+<button type="button" class="hpp-action-btn hpp-action-del" data-action="del" data-id="${r.id}" title="Hapus"><i data-lucide="x" style="width:12px;height:12px"></i></button>
       </div>
       
       <!-- Qty × Harga = Subtotal -->
@@ -1208,6 +1765,7 @@ function updateStepIndicators(b){
   set(2,!sizeError||sizeError.classList.contains('hidden'));
   set(3,b.hppTotal>0);
   set(4,b.final>0);
+  set(6,!!clientNameInput.value);
 }
 
 const hppGroupsWrap=document.getElementById('hppGroupsWrap');
@@ -1689,7 +2247,7 @@ function updateShapeVisual(pM,lM){
   } else if(currentShape==='runner'){
     carpetShape.style.borderRadius='10px';
     const ratio=Math.max(pM,0.5)/Math.max(lM,0.5);
-    carpetShape.style.aspectRatio=`${ratio}/1`;
+    carpetShape.style.aspectRatio=`${Math.max(pM,0.5)}/${Math.max(lM,0.5)}`;   // ← ganti
     carpetShape.style.width=ratio>2.2?'92%':'55%';
   } else if(currentShape==='custom'){
     carpetShape.style.borderRadius='0';
@@ -1701,14 +2259,73 @@ function updateShapeVisual(pM,lM){
     if(uploadedImg&&uploadedImg.naturalWidth&&uploadedImg.naturalHeight){
       ratio=uploadedImg.naturalWidth/uploadedImg.naturalHeight;
     }
-    carpetShape.style.aspectRatio=`${ratio}/1`;
+    carpetShape.style.aspectRatio=`${pM}/${lM}`;
     carpetShape.style.width='78%';
-  } else {
+    } else {
     carpetShape.style.borderRadius='10px';
     const ratio=pM/lM;
-    carpetShape.style.aspectRatio=`${ratio}/1`;
+    carpetShape.style.aspectRatio=`${pM}/${lM}`;      
     carpetShape.style.width=ratio>1.4?'85%':'65%';
   }
+}
+/* ============ EXTRUDE CUSTOM SILHOUETTE ============ */
+function buildExtrudeGeoFromImage(img,targetW,targetD,thickness){
+  const MAX=180;
+  const sw=img.naturalWidth||1, sh=img.naturalHeight||1;
+  const s=Math.min(MAX/sw,MAX/sh);
+  const cw=Math.max(2,Math.round(sw*s)), ch=Math.max(2,Math.round(sh*s));
+
+  const c=document.createElement('canvas');
+  c.width=cw; c.height=ch;
+  const ctx=c.getContext('2d');
+  ctx.drawImage(img,0,0,cw,ch);
+
+  let data;
+  try{ data=ctx.getImageData(0,0,cw,ch).data; }
+  catch(e){ return null; }
+
+  // Cari tepi kiri & kanan per baris (scanline)
+  const left=new Array(ch).fill(-1);
+  const right=new Array(ch).fill(-1);
+  for(let y=0;y<ch;y++){
+    for(let x=0;x<cw;x++){
+      const a=data[(y*cw+x)*4+3];
+      if(a>128){
+        if(left[y]===-1)left[y]=x;
+        right[y]=x;
+      }
+    }
+  }
+
+  const shape=new THREE.Shape();
+  const wS=targetW/cw, dS=targetD/ch;
+  let started=false;
+
+  // Susun tepi kiri dari atas ke bawah
+  for(let y=0;y<ch;y++){
+    if(left[y]===-1)continue;
+    const x=-targetW/2+left[y]*wS;
+    const yy=-targetD/2+y*dS;
+    if(!started){shape.moveTo(x,yy);started=true;}
+    else shape.lineTo(x,yy);
+  }
+  if(!started)return null;
+
+  // Susun tepi kanan dari bawah ke atas
+  for(let y=ch-1;y>=0;y--){
+    if(right[y]===-1)continue;
+    const x=-targetW/2+right[y]*wS;
+    const yy=-targetD/2+y*dS;
+    shape.lineTo(x,yy);
+  }
+  shape.closePath();
+
+  const geo=new THREE.ExtrudeGeometry(shape,{
+    depth:thickness, bevelEnabled:false, curveSegments:1, steps:1
+  });
+  // Rebahan: bentuk di XZ-plane, extrude naik ke +Y
+  geo.rotateX(-Math.PI/2);
+  return geo;
 }
 
 function updateAll(){
@@ -1794,38 +2411,39 @@ function stopThreeLoop(){if(animId){cancelAnimationFrame(animId);animId=null;}}
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden)stopThreeLoop();else if(activeView==='3d')startThreeLoop();
 });
-function buildCarpetTexture(){
-  // Buat kanvas komposit: background + motif
+function buildCarpetTexture(preserveAlpha){
   const cw=400,ch=400;
   const c=document.createElement('canvas');c.width=cw;c.height=ch;
   const ctx=c.getContext('2d');
-  // 1. Background
-  if(bgType==='color'){
-    ctx.fillStyle=bgColor;ctx.fillRect(0,0,cw,ch);
-  } else if(bgType==='image'&&bgImageData){
-    if(bgImgObj){
-      const ba=bgImgObj.naturalWidth/bgImgObj.naturalHeight,ca=cw/ch;
-      let dw,dh,dx,dy;
-      if(ba>ca){dh=ch;dw=ch*ba;dx=(cw-dw)/2;dy=0;}else{dw=cw;dh=cw/ba;dx=0;dy=(ch-dh)/2;}
-      ctx.drawImage(bgImgObj,dx,dy,dw,dh);
+  ctx.clearRect(0,0,cw,ch);
+
+  // 1. Background — SKIP kalau preserveAlpha (custom 3D cutout)
+  if(!preserveAlpha){
+    if(bgType==='color'){
+      ctx.fillStyle=bgColor;ctx.fillRect(0,0,cw,ch);
+    } else if(bgType==='image'&&bgImageData){
+      if(bgImgObj){
+        const ba=bgImgObj.naturalWidth/bgImgObj.naturalHeight,ca=cw/ch;
+        let dw,dh,dx,dy;
+        if(ba>ca){dh=ch;dw=ch*ba;dx=(cw-dw)/2;dy=0;}else{dw=cw;dh=cw/ba;dx=0;dy=(ch-dh)/2;}
+        ctx.drawImage(bgImgObj,dx,dy,dw,dh);
+      }
     } else {
       ctx.fillStyle='#D8CFB8';ctx.fillRect(0,0,cw,ch);
+      ctx.strokeStyle='rgba(34,38,43,0.12)';ctx.lineWidth=2;
+      for(let i=-cw;i<cw;i+=14){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i+cw,ch);ctx.stroke();}
     }
-  } else {
-    ctx.fillStyle='#D8CFB8';ctx.fillRect(0,0,cw,ch);
-    ctx.strokeStyle='rgba(34,38,43,0.12)';ctx.lineWidth=2;
-    for(let i=-cw;i<cw;i+=14){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i+cw,ch);ctx.stroke();}
   }
-  // 2. Motif di atas background
-    if(uploadedImg){
-    // Samakan logika dengan 2D: pakai aspect carpet asli, contain + zoom
+
+
+  // 2. Motif
+  if(uploadedImg){
     const rect=carpetShape.getBoundingClientRect();
     const cwReal=rect.width||400,chReal=rect.height||400;
     const iw=uploadedImg.naturalWidth||1,ih=uploadedImg.naturalHeight||1;
     const fitScale=Math.min(cwReal/iw,chReal/ih);
     const baseW=iw*fitScale,baseH=ih*fitScale;
     const finalW=baseW*imgScale,finalH=baseH*imgScale;
-    // Konversi dari koordinat carpet asli → koordinat kanvas 400x400
     const scaleX=cw/cwReal,scaleY=ch/chReal;
     const dw=finalW*scaleX,dh=finalH*scaleY;
     const offsetX=((cwReal-finalW)/2+imgOffX)*scaleX;
@@ -1841,8 +2459,14 @@ function applyTextureTransform(tex){
   tex.offset.set(0.5-s/2-(imgOffX/refPx)*s,0.5-s/2+(imgOffY/refPx)*s);
 }
 function syncTextureTransform(){
-  if(carpetMesh&&carpetMesh.material&&carpetMesh.material.map&&uploadedImg&&currentShape!=='custom'){
-    applyTextureTransform(carpetMesh.material.map);
+  if(!threeReady||!carpetMesh||!uploadedImg||currentShape==='custom')return;
+  const mat=carpetMesh.material;
+  if(Array.isArray(mat)){
+    // Material array (Box/Cylinder): cari material yang punya map (matTop)
+    const topMat=mat.find(m=>m&&m.map);
+    if(topMat&&topMat.map)applyTextureTransform(topMat.map);
+  } else if(mat&&mat.map){
+    applyTextureTransform(mat.map);
   }
 }
 function buildFiberBumpTexture(){
@@ -1856,23 +2480,64 @@ function update3DCarpet(shape,pM,lM){
   if(!threeReady)return;
   const key=shape+'-'+pM.toFixed(2)+'-'+lM.toFixed(2)+'-'+imgVersion;
   if(carpetGeomKey===key)return;carpetGeomKey=key;
-  if(carpetMesh){scene.remove(carpetMesh);carpetMesh.geometry.dispose();carpetMesh.material.dispose();}
-  let geo;
-  if(shape==='circle'){geo=new THREE.CircleGeometry(pM/2,48);}
-  else{geo=new THREE.PlaneGeometry(pM,lM,1,1);}
-  const useCutout=shape==='custom'&&!!uploadedImg;
-  const texMap=buildCarpetTexture();
-  const mat=new THREE.MeshStandardMaterial({
+  if(carpetMesh){
+  scene.remove(carpetMesh);
+  if(carpetMesh.geometry)carpetMesh.geometry.dispose();
+  const mat=carpetMesh.material;
+  if(Array.isArray(mat)){
+    mat.forEach(m=>{if(m&&typeof m.dispose==='function')m.dispose();});
+  } else if(mat&&typeof mat.dispose==='function'){
+    mat.dispose();
+  }
+}
+      const THICKNESS=0.03;
+  const isCustom=shape==='custom'&&!!uploadedImg;
+  const texMap=buildCarpetTexture(isCustom ? true : false);
+  texMap.anisotropy=renderer.capabilities.getMaxAnisotropy();
+
+  const matTop=new THREE.MeshStandardMaterial({
     map:texMap,bumpMap:buildFiberBumpTexture(),bumpScale:0.012,
-    roughness:0.92,side:THREE.DoubleSide,alphaTest:useCutout?0.4:0
+    roughness:0.92,metalness:0.02
   });
-  mat.needsUpdate=true;
-  carpetMesh=new THREE.Mesh(geo,mat);
-  carpetMesh.rotation.x=-Math.PI/2;carpetMesh.position.y=0.01;carpetMesh.receiveShadow=true;
+  const matSide=new THREE.MeshStandardMaterial({
+    color:0x8B7355,roughness:0.95,metalness:0
+  });
+  const matBottom=new THREE.MeshStandardMaterial({
+    color:0x5C4A35,roughness:1,metalness:0
+  });
+
+  let geo, mats, posY=THICKNESS/2;
+
+  if(shape==='circle'){
+    geo=new THREE.CylinderGeometry(pM/2,pM/2,THICKNESS,48,1,false);
+    mats=[matSide, matTop, matBottom]; // [sisi, atas, bawah]
+     } else if(isCustom){
+    // Custom: planar cutout dengan alphaTest
+    geo=new THREE.PlaneGeometry(pM,lM);
+    geo.rotateX(-Math.PI/2);
+    const cutoutMat=new THREE.MeshStandardMaterial({
+      map:texMap,
+      alphaTest:0.5,              // tanpa transparent:true biar masuk opaque pass
+      side:THREE.DoubleSide,
+      roughness:0.92,
+      metalness:0.02
+    });
+    mats=cutoutMat;               // ⚡ SINGLE material — PlaneGeometry tidak punya groups
+    posY=0.005;
+  } else {
+    geo=new THREE.BoxGeometry(pM,THICKNESS,lM);
+    mats=[matSide, matSide, matTop, matBottom, matSide, matSide];
+  }
+
+  carpetMesh=new THREE.Mesh(geo, mats);
+  carpetMesh.receiveShadow=true;
+  carpetMesh.castShadow=true;
+  carpetMesh.position.y=posY;
   scene.add(carpetMesh);
+
   const maxDim=Math.max(pM,lM,1);
-  camera.position.set(maxDim*0.9,maxDim*0.85,maxDim*1.1);
-  controls&&controls.target.set(0,0,0);
+  camera.position.set(maxDim*0.9,maxDim*0.9,maxDim*1.1);
+  controls&&controls.target.set(0,THICKNESS/2,0);
 }
 function switchView(view){
   activeView=view;
@@ -1924,6 +2589,80 @@ async function doDownload(btn){
 }
 downloadBtn.addEventListener('click',()=>doDownload(downloadBtn));
 downloadBtnM.addEventListener('click',()=>doDownload(downloadBtnM));
+
+/* ============ DOWNLOAD PNG KARPET SAJA ============ */
+async function downloadCarpetOnly(){
+  if(!uploadedImg && bgType==='transparent'){
+    toast('Belum ada motif untuk diunduh.','warn');
+    return;
+  }
+
+  // Ukuran karpet di layar
+  const rect=carpetShape.getBoundingClientRect();
+  const cw=rect.width||300, ch=rect.height||200;
+  const SCALE=3; // ekspor resolusi tinggi
+
+  let canvas=document.createElement('canvas');
+  canvas.width=cw*SCALE;
+  canvas.height=ch*SCALE;
+  const ctx=canvas.getContext('2d');
+  ctx.scale(SCALE,SCALE);
+
+  // 1) Background
+  if(bgType==='color'){
+    ctx.fillStyle=bgColor;
+    ctx.fillRect(0,0,cw,ch);
+  } else if(bgType==='image' && bgImgObj){
+    const ba=bgImgObj.naturalWidth/bgImgObj.naturalHeight;
+    const ca=cw/ch;
+    let dw,dh,dx,dy;
+    if(ba>ca){dh=ch;dw=ch*ba;dx=(cw-dw)/2;dy=0;}
+    else{dw=cw;dh=cw/ba;dx=0;dy=(ch-dh)/2;}
+    ctx.drawImage(bgImgObj,dx,dy,dw,dh);
+  }
+  // kalau transparent — biarkan kosong (PNG transparan)
+
+  // 2) Motif di atas background (logika sama dengan buildCarpetTexture)
+  if(uploadedImg){
+    const iw=uploadedImg.naturalWidth||1,ih=uploadedImg.naturalHeight||1;
+    const fitScale=Math.min(cw/iw,ch/ih);
+    const baseW=iw*fitScale,baseH=ih*fitScale;
+    const finalW=baseW*imgScale,finalH=baseH*imgScale;
+    const offsetX=(cw-finalW)/2+imgOffX;
+    const offsetY=(ch-finalH)/2+imgOffY;
+    ctx.drawImage(uploadedImg,offsetX,offsetY,finalW,finalH);
+  }
+
+  // 3) Kalau bentuk lingkaran — crop jadi bulat
+  if(currentShape==='circle'){
+    const c2=document.createElement('canvas');
+    c2.width=canvas.width;c2.height=canvas.height;
+    const ctx2=c2.getContext('2d');
+    ctx2.beginPath();
+    const r=Math.min(canvas.width,canvas.height)/2;
+    ctx2.arc(canvas.width/2,canvas.height/2,r,0,Math.PI*2);
+    ctx2.clip();
+    ctx2.drawImage(canvas,0,0);
+    canvas=c2;
+  }
+
+  // 4) Export & download
+  canvas.toBlob(blob=>{
+    if(!blob){toast('Gagal membuat PNG.','warn');return;}
+    const link=document.createElement('a');
+    link.href=URL.createObjectURL(blob);
+    link.download='karpet-'+currentShape+'-'+Date.now()+'.png';
+    link.click();
+    URL.revokeObjectURL(link.href);
+    toast('PNG karpet diunduh','ok');
+  },'image/png');
+}
+
+// Wire tombol (dipanggil setelah DOM siap)
+document.addEventListener('DOMContentLoaded',()=>{
+  const btn=document.getElementById('downloadCarpetBtn');
+  if(btn)btn.addEventListener('click',downloadCarpetOnly);
+});
 
 function buildWaText(){
   const o=window._orderSummary,b=o.breakdown;
@@ -2002,7 +2741,6 @@ async function openWaPreview(){
   if(window._orderSummary?.hppZero){
     toast('Total HPP masih Rp 0 — periksa komponen biaya.','warn',4200);
   }
-  saveHistory();
   updateAll();
 
   // Siapkan konten quote card dulu
@@ -2159,7 +2897,6 @@ function openQuote(){
   updateAll();
   fillQuoteContent();
   quoteModal.classList.remove('hidden');quoteModal.classList.add('flex');
-  saveHistory();
 }
 quoteBtn.addEventListener('click',openQuote);quoteBtnM.addEventListener('click',openQuote);
 quoteCloseBtn.addEventListener('click',()=>{quoteModal.classList.add('hidden');quoteModal.classList.remove('flex');});
@@ -2173,7 +2910,16 @@ quoteDownloadBtn.addEventListener('click',()=>{
 });
 quoteWaBtn.addEventListener('click',doWa);
 quotePdfBtn.addEventListener('click',()=>{
-  toast('Pilih "Simpan sebagai PDF" di dialog cetak.','info',3800);
+  // Update tanggal cetak dulu
+  const printDateEl=document.getElementById('printDate');
+  if(printDateEl){
+    const now=new Date();
+    printDateEl.textContent=now.toLocaleString('id-ID',{
+      day:'numeric',month:'long',year:'numeric',
+      hour:'2-digit',minute:'2-digit'
+    });
+  }
+  toast('Pilih "Save as PDF" untuk simpan.','info',3800);
   setTimeout(()=>window.print(),350);
 });
 document.addEventListener('keydown',e=>{
@@ -2185,11 +2931,9 @@ quoteModal.addEventListener('click',e=>{
   if(e.target===quoteModal){quoteModal.classList.add('hidden');quoteModal.classList.remove('flex');}
 });
 
-/* ============ PRESET & HISTORY ============ */
+/* ============ PRESET KOMPONEN ============ */
 function loadPresets(){try{const r=localStorage.getItem(PRESET_KEY);return r?JSON.parse(r):[];}catch(e){return[];}}
 function savePresets(list){try{localStorage.setItem(PRESET_KEY,JSON.stringify(list));}catch(e){toast('Gagal menyimpan preset.','warn');}}
-function loadHistoryList(){try{const r=localStorage.getItem(HISTORY_KEY);return r?JSON.parse(r):[];}catch(e){return[];}}
-function saveHistoryList(list){try{localStorage.setItem(HISTORY_KEY,JSON.stringify(list.slice(0,20)));}catch(e){}}
 
 function renderPresets(){
   const list=loadPresets();
@@ -2226,55 +2970,7 @@ savePresetBtn.addEventListener('click',()=>{
   savePresets(list);presetNameInput.value='';renderPresets();
   toast(`Preset "${name}" disimpan`,'ok');
 });
-
-function renderHistory(){
-  const all=loadHistoryList();
-  const q=(historySearchInput.value||'').trim().toLowerCase();
-  const list=q?all.filter(h=>(h.client||'').toLowerCase().includes(q)||(h.quoteNumber||'').toLowerCase().includes(q)):all;
-  if(!all.length){historyListEl.innerHTML='Belum ada riwayat.';return;}
-  if(!list.length){historyListEl.innerHTML='Tidak ada hasil untuk pencarian ini.';return;}
-  historyListEl.innerHTML=list.map(h=>`
-    <div class="list-row cursor-pointer" data-open="history" data-id="${h.id}">
-      <div style="min-width:0;flex:1"><p class="name">${esc(h.client||'(Tanpa nama)')} • ${esc(h.total)}</p>
-        <p class="meta">${esc(h.quoteNumber||'—')} • ${new Date(h.savedAt).toLocaleString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</p></div>
-      <button class="btn btn-mini btn-gold" data-action="load-history" data-id="${h.id}">Duplikat</button>
-      <button class="btn btn-mini" style="background:var(--rust);color:#fff" data-action="del-history" data-id="${h.id}">✕</button>
-    </div>`).join('');
-}
-historySearchInput.addEventListener('input',debounce(renderHistory,150));
-historyListEl.addEventListener('click',e=>{
-  const btn=e.target.closest('button[data-action]');
-  const list=loadHistoryList();
-  if(btn){
-    const id=+btn.dataset.id,h=list.find(x=>x.id===id);if(!h)return;
-    if(btn.dataset.action==='load-history'){
-      applyState(h.snapshot);renderHppRows();updateAll();saveStateDebounced();
-      toast('Penawaran lama dimuat ulang.','ok',4200);
-    } else if(btn.dataset.action==='del-history'){
-      saveHistoryList(list.filter(x=>x.id!==id));renderHistory();toast('Riwayat dihapus','ok');
-    }
-    return;
-  }
-  const row=e.target.closest('[data-open="history"]');if(!row)return;
-  const h=list.find(x=>x.id===+row.dataset.id);if(!h)return;
-  openHistoryDetail(h);
-});
-function saveHistory(){
-  const o=window._orderSummary;if(!o)return;
-  if(o.breakdown?.final<=0)return;
-  const snapshot={brand:brandName.value,clientName:clientNameInput.value,
-    quoteNumber:quoteNumberInput.value,quoteExpiry:quoteExpiryInput.value,
-    length:lengthInput.value,width:widthInput.value,unit:unitSelect.value,
-    shape:currentShape,margin:marginNumber.value,
-    hppRows:JSON.parse(JSON.stringify(hppRows)),
-    extras:{...extras},perM2Mode,perM2Value,logo:logoDataUrl,imageData:uploadedImageData||null};
-  const list=loadHistoryList();
-  list.unshift({id:Date.now(),savedAt:new Date().toISOString(),
-    client:o.client,total:o.total,quoteNumber:o.quoteNumber,
-    size:o.size,shape:o.shape,area:o.area,hpp:o.hpp,margin:o.margin,snapshot});
-  saveHistoryList(list);renderHistory();
-}
-
+ 
 /* ============ INFO KLIEN ============ */
 clientNameInput.addEventListener('input',()=>{
   recomputeTotals();
@@ -2318,10 +3014,44 @@ function refreshAuthStatus(session){
 }
 logoutBtn&&logoutBtn.addEventListener('click',async()=>{await sb.auth.signOut();toast('Keluar dari sesi admin','ok');});
 if(supabaseReady&&!isClientMode){
-  sb.auth.getSession().then(({data:{session}})=>refreshAuthStatus(session));
+  // Handle session lama yang mungkin expired / rusak
+  sb.auth.getSession().then(({data:{session},error})=>{
+    if(error){
+      console.warn('Session lama rusak, dibersihkan:',error.message);
+      try{localStorage.removeItem('sb-nqajhuekiexmvwosobkm-auth-token');}catch(e){}
+      sb.auth.signOut().catch(()=>{});
+      return;
+    }
+    refreshAuthStatus(session);
+  }).catch(e=>{
+    console.warn('Session fetch gagal:',e.message);
+  });
   sb.auth.onAuthStateChange((_evt,session)=>refreshAuthStatus(session));
 }
+document.getElementById('clientPrintBtn').addEventListener('click',()=>{
+  updateAll();
+  fillQuoteContent();
 
+  // Isi tanggal cetak
+  const printDateEl=document.getElementById('printDate');
+  if(printDateEl){
+    const now=new Date();
+    printDateEl.textContent=now.toLocaleString('id-ID',{
+      day:'numeric',month:'long',year:'numeric',
+      hour:'2-digit',minute:'2-digit'
+    });
+  }
+
+  quoteModal.classList.remove('hidden');
+  quoteModal.classList.add('flex');
+  setTimeout(()=>{
+    window.print();
+    setTimeout(()=>{
+      quoteModal.classList.add('hidden');
+      quoteModal.classList.remove('flex');
+    }, 800);
+  }, 500);
+});
 /* ============ BUAT LINK KLIEN (ADMIN) ============ */
 createLinkBtn.addEventListener('click',()=>{
   withLoading(createLinkBtn,'Memeriksa akses…',async()=>{
@@ -2334,28 +3064,50 @@ createLinkBtn.addEventListener('click',()=>{
     updateAll();
     const o=window._orderSummary;
     if(!o||o.breakdown.final<=0){toast('Lengkapi ukuran & komponen biaya dulu.','warn');return;}
+
     const orderNumber=generateOrderNumber();
+    const shareToken=(crypto.randomUUID()+crypto.randomUUID()).replace(/-/g,'');
+
     const unit=unitSelect.value,toMeter=v=>unit==='cm'?v/100:v;
     const payload={
-      order_number:orderNumber,
-      brand:brandName.value,
-      client_name:clientNameInput.value||null,
-      size_text:currentSizeText,
-      shape:currentShape,
-      length_m:toMeter(parseFloat(lengthInput.value)||0),
-      width_m:currentShape==='circle'?toMeter(parseFloat(lengthInput.value)||0):toMeter(parseFloat(widthInput.value)||0),
-      area_m2:currentAreaM2,
-      image_data:uploadedImageData||null,
-      final_price:o.breakdown.final,
-      status:'menunggu',
-      expires_at:quoteExpiryInput.value||null
+      order_number:   orderNumber,
+      share_token:    shareToken,
+      brand:          brandName.value,
+      client_name:    clientNameInput.value || null,
+      size_text:      currentSizeText,
+      shape:          currentShape,
+      length_m:       toMeter(parseFloat(lengthInput.value)||0),
+      width_m:        currentShape==='circle'
+                        ? toMeter(parseFloat(lengthInput.value)||0)
+                        : toMeter(parseFloat(widthInput.value)||0),
+      area_m2:        currentAreaM2,
+      image_data:     uploadedImageData || null,
+      final_price:    o.breakdown.final,
+      status:         'menunggu',
+      production_days:+document.getElementById('productionDaysInput').value || 14,
+      dp_percent:     +document.getElementById('dpPercentInput').value || 50,
+      payment_info:   document.getElementById('paymentInfoInput').value || null,
+      terms:          document.getElementById('termsInput').value || null,
+      expires_at:     quoteExpiryInput.value || null,
+      img_scale:      imgScale,
+      img_off_x:      imgOffX,
+      img_off_y:      imgOffY,
+      bg_type:        bgType,
+      bg_color:       bgColor,
+      bg_image_data:  bgImageData
+      
     };
+
     const{error}=await sb.from('orders').insert(payload);
     if(error){toast('Gagal menyimpan pesanan: '+error.message,'warn',5200);return;}
-    const link=`${location.origin}${location.pathname}?pesanan=${orderNumber}`;
-    linkOutput.value=link;linkOrderNum.textContent='No. Pesanan: '+orderNumber;
+
+      const link=`${location.origin}${location.pathname}?t=${shareToken}`;
+    linkOutput.value=link;
+    linkOrderNum.textContent='No. Pesanan: '+orderNumber;
     linkModal.classList.remove('hidden');linkModal.classList.add('flex');
     toast('Link klien berhasil dibuat','ok');
+
+    
   });
 });
 copyLinkBtn.addEventListener('click',async()=>{
@@ -2375,64 +3127,242 @@ confirmOkBtn.addEventListener('click',()=>{
 });
 confirmModal.addEventListener('click',e=>{if(e.target===confirmModal)confirmCancelBtn.click();});
 
-/* ============ DASHBOARD PESANAN CLOUD (ADMIN) ============ */
+
+/* ============ DASHBOARD PESANAN CLOUD ============ */
 let dashOrdersCache=[];
-function statusLabelShort(status){return{menunggu:'Menunggu',dikonfirmasi:'Dikonfirmasi',selesai:'Selesai'}[status]||'Menunggu';}
-async function loadDashboard(){
+let activeFilter='all';
+
+function statusLabelShort(status){
+  return {
+    menunggu:'Menunggu', dikonfirmasi:'Dikonfirmasi',
+    desain:'Proses Desain', produksi:'Produksi', finishing:'Finishing',
+    dikerjakan:'Dikerjakan', siap_kirim:'Siap Kirim',
+    selesai:'Selesai', kadaluarsa:'Kadaluarsa'
+  }[status] || 'Menunggu';
+}
+
+function relTime(iso){
+  const d=new Date(iso),now=new Date(),diff=(now-d)/1000;
+  if(diff<60)return 'baru saja';
+  if(diff<3600)return Math.floor(diff/60)+' mnt lalu';
+  if(diff<86400)return Math.floor(diff/3600)+' jam lalu';
+  if(diff<604800)return Math.floor(diff/86400)+' hari lalu';
+  return d.toLocaleDateString('id-ID',{day:'numeric',month:'short'});
+}
+
+async function loadDashboard(silent){
   if(!supabaseReady){dashListEl.innerHTML='Supabase belum dikonfigurasi.';return;}
-  const authed=await ensureAdminAuth();
-  if(!authed){toast('Login dibutuhkan untuk membuka dashboard.','warn');return;}
-  withLoading(dashRefreshBtn,'Memuat…',async()=>{
+  if(!silent){
+    const authed=await ensureAdminAuth();
+    if(!authed){toast('Login dibutuhkan untuk membuka dashboard.','warn');return;}
+  }
+  try{
     const{data,error}=await sb.from('orders').select('*').order('created_at',{ascending:false}).limit(200);
-    if(error){toast('Gagal memuat pesanan: '+error.message,'warn',5200);return;}
+    if(error){if(!silent)toast('Gagal memuat: '+error.message,'warn',5200);return;}
     dashOrdersCache=data||[];
     renderDashboard();
-  });
+
+    // Realtime
+    if(!window._rtChannel){
+      window._rtChannel=sb.channel('orders-rt')
+        .on('postgres_changes',{event:'*',schema:'public',table:'orders'},()=>{loadDashboard(true);})
+        .subscribe();
+    }
+  }catch(e){
+    if(!silent)toast('Error: '+e.message,'warn');
+  }
 }
+
 function renderDashboard(){
   const list=dashOrdersCache;
   const now=new Date(),thisMonth=now.getMonth(),thisYear=now.getFullYear();
-  let omzet=0,confirmed=0,pending=0;
+
+  // Stats
+  let omzet=0,total=list.length,pending=0,done=0;
+  const confirmedStatuses=['dikonfirmasi','desain','produksi','finishing','dikerjakan','siap_kirim','selesai'];
   list.forEach(o=>{
     const d=new Date(o.created_at);
     if(d.getMonth()===thisMonth&&d.getFullYear()===thisYear)omzet+=Number(o.final_price)||0;
-    if(o.status==='dikonfirmasi'||o.status==='selesai')confirmed++;else pending++;
+    if(o.status==='menunggu')pending++;
+    if(o.status==='selesai')done++;
   });
-  dashOmzet.textContent=fmt(omzet);dashConfirmed.textContent=confirmed;dashPending.textContent=pending;
-  if(!list.length){dashListEl.innerHTML='Belum ada pesanan.';return;}
+  const el=s=>document.getElementById(s);
+  if(el('statOmzet'))el('statOmzet').textContent=fmt(omzet);
+  if(el('statTotal'))el('statTotal').textContent=total;
+  if(el('statPending'))el('statPending').textContent=pending;
+  if(el('statDone'))el('statDone').textContent=done;
+
+  // Badge notif di judul step
+  const stepTitle=document.querySelector('[data-toggle="7"] .acc-title');
+  if(stepTitle){
+    stepTitle.innerHTML=pending>0
+      ? `Riwayat Pesanan <span style="background:var(--rust);color:#fff;font-size:10px;padding:2px 7px;border-radius:10px;margin-left:6px">${pending} baru</span>`
+      : 'Riwayat Pesanan';
+  }
+
+  if(!total){dashListEl.innerHTML='<p class="text-xs text-center py-6" style="color:var(--muted)">Belum ada pesanan. Tekan Refresh untuk memuat.</p>';return;}
+
+  // Filter
   const q=(dashSearchInput.value||'').trim().toLowerCase();
-  const filtered=q?list.filter(o=>(o.client_name||'').toLowerCase().includes(q)||(o.order_number||'').toLowerCase().includes(q)):list;
-  if(!filtered.length){dashListEl.innerHTML='Tidak ada hasil untuk pencarian ini.';return;}
+  let filtered=list;
+  if(activeFilter==='menunggu')filtered=filtered.filter(o=>o.status==='menunggu');
+  else if(activeFilter==='dikonfirmasi')filtered=filtered.filter(o=>o.status==='dikonfirmasi');
+  else if(activeFilter==='proses')filtered=filtered.filter(o=>['desain','produksi','finishing','dikerjakan','siap_kirim'].includes(o.status));
+  else if(activeFilter==='selesai')filtered=filtered.filter(o=>o.status==='selesai');
+  if(q)filtered=filtered.filter(o=>(o.client_name||'').toLowerCase().includes(q)||(o.order_number||'').toLowerCase().includes(q));
+
+  if(!filtered.length){
+    dashListEl.innerHTML='<p class="text-xs text-center py-6" style="color:var(--muted)">Tidak ada pesanan pada filter ini.</p>';
+    return;
+  }
+
   dashListEl.innerHTML=filtered.map(o=>{
     const isExpired=o.expires_at&&new Date(o.expires_at+'T23:59:59')<now;
     const st=isExpired&&o.status==='menunggu'?'kadaluarsa':(o.status||'menunggu');
-    return `<div class="list-row items-start cursor-pointer" data-open="order" data-order="${esc(o.order_number)}">
-      <div style="min-width:0;flex:1">
-        <p class="name">${esc(o.client_name||'(Tanpa nama)')} • ${fmt(o.final_price)}</p>
-        <p class="meta">${esc(o.order_number)} • ${new Date(o.created_at).toLocaleDateString('id-ID',{day:'numeric',month:'short'})}</p>
+    return `
+      <div class="order-row" data-order="${esc(o.order_number)}">
+        <div class="head">
+          <div style="min-width:0;flex:1">
+            <p class="name">${esc(o.client_name||'(Tanpa nama)')}</p>
+            <p class="meta">${esc(o.order_number)} • ${relTime(o.created_at)}</p>
+          </div>
+          <p class="price">${fmt(o.final_price)}</p>
+        </div>
+                   ${o.revision_note||o.revision_image?`
+      <div style="margin-bottom:6px;display:flex;gap:8px;align-items:flex-start">
+        ${o.revision_image?`<img src="${o.revision_image}" style="width:44px;height:44px;border-radius:8px;object-fit:cover;border:1px solid var(--line);flex-shrink:0" alt="Gambar revisi"/>`:''}
+        <div style="min-width:0;flex:1">
+          <span class="rev-badge"><i data-lucide="mail" style="width:10px;height:10px;display:inline-block;vertical-align:-1px;margin-right:2px"></i>${o.revision_image?'Gambar baru':'Catatan revisi'}</span>
+          ${o.revision_note?`<p style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4">${esc(o.revision_note.slice(0,80))}${o.revision_note.length>80?'...':''}</p>`:''}
+          ${o.revision_image?`<button class="btn btn-gold btn-mini mt-2" data-apply-image="${esc(o.order_number)}" style="font-size:10px;padding:4px 10px;min-height:auto"><i data-lucide="download" style="width:11px;height:11px;display:inline-block;vertical-align:-2px;margin-right:3px"></i>Pakai Gambar Ini</button>`:''}
+        </div>
       </div>
+    `:''}
+    <div class="body">
       <span class="status-badge status-${st}">${statusLabelShort(st)}</span>
-      ${st!=='selesai'?`<button class="btn btn-mini btn-gold" data-action="mark-selesai" data-id="${esc(o.order_number)}">Selesai</button>`:''}
-    </div>`;
+      <select data-status-select="${esc(o.order_number)}">
+        <option value="menunggu"     ${st==='menunggu'?'selected':''}>Menunggu</option>
+        <option value="dikonfirmasi" ${st==='dikonfirmasi'?'selected':''}>Dikonfirmasi</option>
+        <option value="desain"       ${st==='desain'?'selected':''}>Desain</option>
+        <option value="produksi"     ${st==='produksi'?'selected':''}>Produksi</option>
+        <option value="finishing"    ${st==='finishing'?'selected':''}>Finishing</option>
+        <option value="siap_kirim"   ${st==='siap_kirim'?'selected':''}>Siap Kirim</option>
+        <option value="selesai"      ${st==='selesai'?'selected':''}>Selesai</option>
+      </select>
+      <div class="actions">
+        <button class="hpp-action-btn" data-view-order="${esc(o.order_number)}" title="Detail"><i data-lucide="eye" style="width:12px;height:12px"></i></button>
+<button class="hpp-action-btn hpp-action-del" data-delete-order="${esc(o.order_number)}" title="Hapus"><i data-lucide="trash-2" style="width:12px;height:12px"></i></button>
+      </div>
+    </div>
+  </div>`;
   }).join('');
+  if(typeof renderHistory==='function')renderHistory();   // ini sudah ada? kalau iya, ganti dengan:
+  renderIcons();
 }
+
+dashRefreshBtn.addEventListener('click',()=>loadDashboard(false));
+dashLoginBtn.addEventListener('click',()=>{showLoginModal();});
+
+// Filter tabs
+document.getElementById('filterTabs').addEventListener('click',e=>{
+  const tab=e.target.closest('.filter-tab');if(!tab)return;
+  document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  activeFilter=tab.dataset.filter;
+  renderDashboard();
+});
+
+function applyClientImage(o){
+  const proceed=confirm(`Pakai gambar dari ${o.client_name||'klien'} sebagai motif baru?\n\nGambar mockup saat ini akan terganti. Kamu bisa atur posisi lalu download PNG baru.`);
+  if(!proceed)return;
+
+  const img=new Image();
+  img.onload=()=>{
+    uploadedImg=img;
+    uploadedImageData=o.revision_image;
+    uploadedImageName='Revisi dari '+(o.client_name||'klien');
+    imgVersion++;
+    imgScale=1;imgOffX=0;imgOffY=0;
+
+    carpetShape.classList.remove('empty');
+    carpetImgEl.style.backgroundImage=`url("${o.revision_image}")`;
+    carpetImgEl.classList.remove('hidden');
+
+    if(imgAdjustPanel)imgAdjustPanel.classList.remove('hidden');
+    if(bgPanel)bgPanel.classList.remove('hidden');
+    if(fileName)fileName.textContent='Gambar: '+uploadedImageName;
+
+    if(clientNameInput)clientNameInput.value=o.client_name||'';
+
+    requestAnimationFrame(()=>{
+      updateAll();
+      applyImgTransform();
+    });
+
+    toast('Gambar klien dimuat ke mockup. Atur posisi lalu download.','ok',5000);
+
+    const step1=document.querySelector('[data-toggle="1"]');
+    if(step1){
+      step1.click();
+      setTimeout(()=>{
+        const acc1=step1.closest('.acc');
+        if(acc1)acc1.scrollIntoView({behavior:'smooth',block:'start'});
+      },150);
+    }
+  };
+  img.onerror=()=>toast('Gagal memuat gambar klien.','warn');
+  img.src=o.revision_image;
+}
+// Search
+dashSearchInput.addEventListener('input',debounce(renderDashboard,200));
+
+// Klik baris: dropdown → ubah status, ikon → aksi
+dashListEl.addEventListener('change',async e=>{
+  const sel=e.target.closest('[data-status-select]');
+  if(!sel)return;
+  const authed=await ensureAdminAuth();if(!authed)return;
+  const orderNum=sel.dataset.statusSelect,newStatus=sel.value;
+  const{error}=await sb.from('orders').update({status:newStatus}).eq('order_number',orderNum);
+  if(error){toast('Gagal update: '+error.message,'warn',4800);return;}
+  toast(`Status → ${statusLabelShort(newStatus)}`,'ok');
+  loadDashboard(true);
+});
+
 dashListEl.addEventListener('click',async e=>{
-  const btn=e.target.closest('[data-action="mark-selesai"]');
-  if(btn){
-    const authed=await ensureAdminAuth();if(!authed)return;
-    const{error}=await sb.from('orders').update({status:'selesai'}).eq('order_number',btn.dataset.id);
-    if(error){toast('Gagal memperbarui status: '+error.message,'warn',4800);return;}
-    toast('Ditandai selesai','ok');loadDashboard();
+  const applyBtn=e.target.closest('[data-apply-image]');
+  const viewBtn=e.target.closest('[data-view-order]');
+  const delBtn=e.target.closest('[data-delete-order]');
+
+  // 1) Pakai gambar klien
+  if(applyBtn){
+    const o=dashOrdersCache.find(x=>x.order_number===applyBtn.dataset.applyImage);
+    if(!o||!o.revision_image){toast('Tidak ada gambar untuk dipakai.','warn');return;}
+    applyClientImage(o);
     return;
   }
-  const row=e.target.closest('[data-open="order"]');if(!row)return;
-  const o=dashOrdersCache.find(x=>x.order_number===row.dataset.order);if(!o)return;
-  openOrderDetail(o);
+
+  // 2) Lihat detail
+  if(viewBtn){
+    const o=dashOrdersCache.find(x=>x.order_number===viewBtn.dataset.viewOrder);
+    if(o)openOrderDetail(o);
+    return;
+  }
+
+  // 3) Hapus pesanan
+  if(delBtn){
+    const authed=await ensureAdminAuth();if(!authed)return;
+    const orderNum=delBtn.dataset.deleteOrder;
+    const ok=await confirmDialog(`Hapus pesanan ${orderNum}? Tindakan ini tidak bisa dibatalkan.`);
+    if(!ok)return;
+    const{error}=await sb.from('orders').delete().eq('order_number',orderNum);
+    if(error){toast('Gagal hapus: '+error.message,'warn',4800);return;}
+    toast('Pesanan dihapus','ok');
+    loadDashboard(true);
+  }
 });
-dashRefreshBtn.addEventListener('click',loadDashboard);
-dashSearchInput.addEventListener('input',debounce(renderDashboard,150));
+// CSV Export
 dashExportBtn.addEventListener('click',()=>{
-  if(!dashOrdersCache.length){toast('Muat data dulu sebelum ekspor.','warn');return;}
+  if(!dashOrdersCache.length){toast('Muat data dulu.','warn');return;}
   const header=['No. Pesanan','Klien','Ukuran','Bentuk','Luas (m2)','Harga Akhir','Status','Tanggal'];
   const rows=dashOrdersCache.map(o=>[o.order_number,o.client_name||'',o.size_text||'',o.shape||'',o.area_m2||'',o.final_price||0,statusLabelShort(o.status),new Date(o.created_at).toLocaleDateString('id-ID')]);
   const csv=[header,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');
@@ -2441,7 +3371,6 @@ dashExportBtn.addEventListener('click',()=>{
   link.download='riwayat-pesanan-'+new Date().toISOString().slice(0,10)+'.csv';link.click();
   toast('CSV diunduh','ok');
 });
-
 /* ============ DETAIL PESANAN (POPUP) ============ */
 function openDetail(){detailModal.classList.remove('hidden');detailModal.classList.add('flex');}
 function closeDetail(){detailModal.classList.add('hidden');detailModal.classList.remove('flex');detailLoadBtn.onclick=null;}
@@ -2454,23 +3383,7 @@ function fillDetailImage(src){
   const img=document.createElement('img');img.src=src;img.className='w-full h-full object-cover';
   detailImgWrap.appendChild(img);
 }
-function openHistoryDetail(h){
-  detailTitle.textContent=h.client||'(Tanpa nama)';
-  detailSubtitle.textContent=(h.quoteNumber||'—')+' • '+new Date(h.savedAt).toLocaleString('id-ID',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  detailStatusBadge.classList.add('hidden');
-  fillDetailImage(h.snapshot?.imageData||null);
-  detailClient.textContent=h.client||'—';
-  detailSize.textContent=h.size||'—';detailShape.textContent=h.shape||'—';detailArea.textContent=h.area||'—';
-  detailHppRow.classList.toggle('hidden',!h.hpp);detailHpp.textContent=h.hpp||'';
-  detailMarginRow.classList.toggle('hidden',!h.margin);detailMargin.textContent=h.margin||'';
-  detailTotal.textContent=h.total||'Rp 0';
-  detailLoadBtn.classList.remove('hidden');
-  detailLoadBtn.onclick=()=>{
-    applyState(h.snapshot);renderHppRows();updateAll();saveStateDebounced();
-    toast('Penawaran lama dimuat ulang.','ok',4200);closeDetail();
-  };
-  openDetail();
-}
+
 function openOrderDetail(o){
   const now=new Date();
   const isExpired=o.expires_at&&new Date(o.expires_at+'T23:59:59')<now;
@@ -2480,7 +3393,30 @@ function openOrderDetail(o){
   detailStatusBadge.classList.remove('hidden');
   detailStatusBadge.className='status-badge shrink-0 ml-2 status-'+st;
   detailStatusBadge.textContent=statusLabelShort(st);
-  fillDetailImage(o.image_data||null);
+    // Tampilkan 2 gambar: mockup asli + revisi (kalau ada)
+  detailImgWrap.innerHTML='';
+  detailImgWrap.classList.remove('hidden');
+  const wrap=document.createElement('div');
+  wrap.style.cssText='display:flex;flex-direction:column;gap:6px';
+  
+  if(o.image_data){
+    const img=document.createElement('img');
+    img.src=o.image_data;
+    img.style.cssText='width:100%;border-radius:8px;display:block';
+    wrap.appendChild(img);
+  }
+  if(o.revision_image){
+    const label=document.createElement('p');
+    label.style.cssText='font-size:10px;font-weight:700;color:var(--rust);margin:4px 0 0';
+    label.textContent='📩 Gambar dari Klien (revisi)';
+    wrap.appendChild(label);
+    
+    const img2=document.createElement('img');
+    img2.src=o.revision_image;
+    img2.style.cssText='width:100%;border-radius:8px;display:block;border:2px solid var(--rust)';
+    wrap.appendChild(img2);
+  }
+  detailImgWrap.appendChild(wrap);
   detailClient.textContent=o.client_name||'—';
   detailSize.textContent=o.size_text||'—';detailShape.textContent=shapeLabels[o.shape]||o.shape||'—';
   detailArea.textContent=fmtArea(o.area_m2||0);
@@ -2497,9 +3433,10 @@ function enterClientMode(){
   resetAllBtn.classList.add('hidden');
   createLinkBtn&&createLinkBtn.closest('.acc')&&createLinkBtn.closest('.acc').classList.add('hidden');
   quoteBtn.classList.add('hidden');quoteBtnM.classList.add('hidden');
+  waBtn.classList.add('hidden');waBtnM.classList.add('hidden');   // ← TAMBAH INI
   logoInput.disabled=true;brandName.readOnly=true;
   clientInfoCard.classList.remove('hidden');
-  clientOrderNum.textContent='No. Pesanan: '+orderParam;
+  clientOrderNum.textContent='Link klien aktif';
   document.querySelector('main').prepend(clientInfoCard);
 }
 async function loadClientOrder(){
@@ -2507,69 +3444,166 @@ async function loadClientOrder(){
     clientInfoText.textContent='Konfigurasi penyimpanan belum lengkap. Hubungi penjual untuk link yang valid.';
     return;
   }
-  const{data,error}=await sb.from('orders').select('*').eq('order_number',orderParam).single();
-  if(error||!data){
+  const{data,error}=await sb.rpc('get_client_order',{p_token:clientToken});
+  const row=Array.isArray(data)?data[0]:data;
+  if(error||!row){
     clientInfoText.textContent='Pesanan tidak ditemukan. Pastikan link yang Anda buka benar, atau hubungi penjual.';
     return;
   }
-  brandName.value=data.brand||'Rangkai Karpet Studio';
-  currentShape=data.shape||'rect';
+  const data2=row;   // alias biar sisa kode di bawah tidak perlu diubah banyak
+  brandName.value=data2.brand||'Rangkai Karpet Studio';
+  currentShape=data2.shape||'rect';
   applyShapeUI();
   shapeBtns.forEach(b=>b.classList.toggle('active',b.dataset.shape===currentShape));
-  const p=Number(data.length_m)||1,l=Number(data.width_m)||p;
-  currentAreaM2=Number(data.area_m2)||0;
-  currentSizeText=data.size_text||'';
-  if(data.image_data){
-  uploadedImageData=data.image_data;
-  carpetShape.classList.remove('empty');
-  carpetImgEl.style.backgroundImage=`url("${data.image_data}")`;
-  carpetImgEl.classList.remove('hidden');
-    const img=new Image();
-    img.onload=()=>{uploadedImg=img;imgVersion++;updateShapeVisual(Math.max(p,0.01),Math.max(l,0.01));update3DCarpet(currentShape,Math.max(p,0.2),Math.max(l,0.2));};
-    img.src=data.image_data;
-  } else {
+  const p=Number(data2.length_m)||1,l=Number(data2.width_m)||p;
+  currentAreaM2=Number(data2.area_m2)||0;
+  currentSizeText=data2.size_text||'';
+    if(data2.image_data){
+    uploadedImageData=data2.image_data;
+    carpetShape.classList.remove('empty');
+    carpetImgEl.style.backgroundImage=`url("${data2.image_data}")`;
+    carpetImgEl.classList.remove('hidden');
+      const img=new Image();
+    img.onload=()=>{
+      uploadedImg=img;imgVersion++;
+
+      // Terapkan posisi/zoom yang disimpan admin
+      imgScale = Number(data2.img_scale) || 1;
+      imgOffX  = Number(data2.img_off_x) || 0;
+      imgOffY  = Number(data2.img_off_y) || 0;
+
+      // Terapkan background (warna/gambar) yang disimpan admin
+      if(data2.bg_type){
+        bgType = data2.bg_type;
+        bgColor = data2.bg_color || '#F3EEDF';
+        bgImageData = data2.bg_image_data || null;
+        renderBg();
+      }
+
+      updateShapeVisual(Math.max(p,0.01),Math.max(l,0.01));
+      update3DCarpet(currentShape,Math.max(p,0.2),Math.max(l,0.2));
+
+      // Terapkan transform gambar SETELAH layout stabil
+      requestAnimationFrame(()=>{
+        applyImgTransform();
+        setTimeout(applyImgTransform, 100);
+      });
+    };
+    img.src=data2.image_data;
     updateShapeVisual(Math.max(p,0.01),Math.max(l,0.01));
     update3DCarpet(currentShape,Math.max(p,0.2),Math.max(l,0.2));
   }
-  sumSize.textContent=currentSizeText;sumShape.textContent=shapeLabels[currentShape]||currentShape;
+  sumSize.textContent=currentSizeText;
+  sumShape.textContent=shapeLabels[currentShape]||currentShape;
   sumArea.textContent=fmtArea(currentAreaM2);
   document.getElementById('sumMargin').closest('.flex').classList.add('hidden');
-  animateNumber(sumTotal,Number(data.final_price)||0);
-  stickyTotal.textContent=fmt(Number(data.final_price)||0);
-  window._orderSummary={brand:data.brand,client:data.client_name||'',quoteNumber:orderParam,
+  animateNumber(sumTotal,Number(data2.final_price)||0);
+  stickyTotal.textContent=fmt(Number(data2.final_price)||0);
+  window._orderSummary={brand:data2.brand,client:data2.client_name||'',quoteNumber:data2.order_number,
     size:currentSizeText,shape:shapeLabels[currentShape]||currentShape,area:fmtArea(currentAreaM2),
-    total:fmt(Number(data.final_price)||0),hppZero:false,
-    breakdown:{ongkir:0,instalasi:0,diskon:0,ppn:0,final:Number(data.final_price)||0}};
-  const isExpired=data.expires_at&&new Date(data.expires_at+'T23:59:59')<new Date();
-  const status=isExpired?'kadaluarsa':(data.status||'menunggu');
-  const statusLabel={menunggu:'⏳ Menunggu Konfirmasi',dikonfirmasi:'✅ Sudah Dikonfirmasi',selesai:'🎉 Selesai',kadaluarsa:'⚠ Sudah Kadaluarsa'}[status];
-  clientStatusBadge.textContent=statusLabel;
+    total:fmt(Number(data2.final_price)||0),hppZero:false,
+    breakdown:{ongkir:0,instalasi:0,diskon:0,ppn:0,final:Number(data2.final_price)||0}};
+
+  const isExpired=data2.expires_at&&new Date(data2.expires_at+'T23:59:59')<new Date();
+  const status=isExpired?'kadaluarsa':(data2.status||'menunggu');
+  const statusLabel={
+  menunggu:'Menunggu Konfirmasi',
+  dikonfirmasi:'Sudah Dikonfirmasi',
+  dikerjakan:'Sedang Dikerjakan',
+  desain:'Proses Desain',
+  produksi:'Produksi',
+  finishing:'Finishing',
+  siap_kirim:'Siap Kirim',
+  selesai:'Selesai',
+  kadaluarsa:'Sudah Kadaluarsa'
+}[status] || 'Menunggu Konfirmasi';   
+   clientStatusBadge.textContent=statusLabel;
   clientStatusBadge.className='status-badge mt-2 inline-block status-'+status;
+
+  // Set progress bar pertama kali
+  const stageMap={menunggu:1,dikonfirmasi:2,desain:2,produksi:3,finishing:3,dikerjakan:3,siap_kirim:3,selesai:4,kadaluarsa:0};
+  const stage=stageMap[status]||1;
+  const cpBar=document.getElementById('cpBar');
+  if(cpBar)cpBar.style.width=(stage/4*100)+'%';
+
+  const expiryEl=document.getElementById('clientExpiryInfo');
+  if(expiryEl&&data2.expires_at){
+    const d=new Date(data2.expires_at);
+    expiryEl.textContent='Berlaku hingga '+d.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+  }
+
   if(isExpired){
     clientInfoText.textContent='Mohon maaf, penawaran ini sudah melewati batas waktu berlaku. Silakan hubungi penjual untuk penawaran baru.';
     waBtn.disabled=true;waBtnM.disabled=true;
-  } else if((data.status||'menunggu')==='menunggu'){
+  } else if((data2.status||'menunggu')==='menunggu'){
     clientInfoText.textContent='Berikut mockup dan harga penawaran karpet custom Anda. Tekan tombol di bawah untuk konfirmasi, lalu hubungi kami via WhatsApp.';
     clientConfirmBtn.classList.remove('hidden');
-    clientConfirmBtn.addEventListener('click',()=>withLoading(clientConfirmBtn,'Menyimpan…',async()=>{
-      const{error}=await sb.from('orders').update({status:'dikonfirmasi'}).eq('order_number',orderParam);
+    clientConfirmBtn.onclick=()=>withLoading(clientConfirmBtn,'Menyimpan…',async()=>{
+      const{error}=await sb.rpc('client_confirm_order',{p_token:clientToken});
       if(error){toast('Gagal konfirmasi: '+error.message,'warn',4800);return;}
       clientConfirmBtn.classList.add('hidden');
-      clientStatusBadge.textContent=statusLabel==null?'':'✅ Sudah Dikonfirmasi';
+      clientStatusBadge.textContent='✅ Sudah Dikonfirmasi';
       clientStatusBadge.className='status-badge mt-2 inline-block status-dikonfirmasi';
       clientInfoText.textContent='Pesanan Anda sudah dikonfirmasi. Silakan hubungi kami via WhatsApp untuk proses selanjutnya.';
       toast('Pesanan dikonfirmasi','ok');
-    }));
+    });
   } else {
     clientInfoText.textContent='Berikut mockup dan harga penawaran karpet custom Anda.';
   }
 }
 
+/* Polling status klien tiap 15 detik */
+let clientPollTimer=null;
+function startClientPolling(){
+  if(clientPollTimer)return;
+  clientPollTimer=setInterval(async()=>{
+    if(document.hidden)return; // hemat kuota: stop saat tab tidak aktif
+    try{
+      const{data,error}=await sb.rpc('get_client_order',{p_token:clientToken});
+      const row=Array.isArray(data)?data[0]:data;
+      if(error||!row)return;
+
+      // Update badge status kalau berubah
+      const isExpired=row.expires_at&&new Date(row.expires_at+'T23:59:59')<new Date();
+      const newStatus=isExpired?'kadaluarsa':(row.status||'menunggu');
+
+      const statusLabel={
+        menunggu:'⏳ Menunggu Konfirmasi',
+        dikonfirmasi:'✅ Sudah Dikonfirmasi',
+        dikerjakan:'🔧 Sedang Dikerjakan',
+        desain:'🎨 Proses Desain',
+        produksi:'🧵 Produksi',
+        finishing:'✂️ Finishing',
+        siap_kirim:'📦 Siap Kirim',
+        selesai:'🎉 Selesai',
+        kadaluarsa:'⚠ Sudah Kadaluarsa'
+      }[newStatus];
+
+      if(clientStatusBadge.textContent!==statusLabel){
+        clientStatusBadge.textContent=statusLabel;
+        clientStatusBadge.className='status-badge mt-2 inline-block status-'+newStatus;
+        // Update text info juga
+        if(newStatus==='dikerjakan')clientInfoText.textContent='Pesanan Anda sedang dikerjakan. Kami akan kabari bila ada update.';
+          else if(newStatus==='produksi')clientInfoText.textContent='Pesanan Anda sedang masuk tahap produksi.';
+          else if(newStatus==='finishing')clientInfoText.textContent='Pesanan Anda memasuki tahap finishing.';
+          else if(newStatus==='siap_kirim')clientInfoText.textContent='Pesanan Anda siap dikirim!';
+          else if(newStatus==='selesai')clientInfoText.textContent='Pesanan selesai. Terima kasih sudah mempercayakan kami!';
+        // Progress bar
+        const stageMap={menunggu:1,dikonfirmasi:2,desain:2,produksi:3,finishing:3,dikerjakan:3,siap_kirim:3,selesai:4,kadaluarsa:0};
+        const stage=stageMap[newStatus]||1;
+        const cpBar=document.getElementById('cpBar');
+        if(cpBar)cpBar.style.width=(stage/4*100)+'%';
+        toast('Status pesanan diperbarui','ok',3000);
+      }
+    }catch(e){console.warn('Poll error:',e);}
+  },15000); // 15 detik
+}
+
 /* ============ RESET ============ */
 resetAllBtn.addEventListener('click',()=>{
-  confirmDialog('Reset semua data? Semua pengaturan, komponen biaya, gambar, logo, preset, dan riwayat akan dihapus.').then(ok=>{
+  confirmDialog('Reset semua data? Semua pengaturan, komponen biaya, gambar, logo, dan preset akan dihapus.').then(ok=>{
     if(!ok)return;
-  try{localStorage.removeItem(STORAGE_KEY);localStorage.removeItem(PRESET_KEY);localStorage.removeItem(HISTORY_KEY);}catch(e){}
+  try{localStorage.removeItem(STORAGE_KEY);localStorage.removeItem(PRESET_KEY);}catch(e){}
   toast('Data direset. Memuat ulang…','ok');
   setTimeout(()=>location.reload(),500);
   });
@@ -2618,14 +3652,25 @@ brandName.addEventListener('input',()=>{saveStateDebounced();});
   if(isClientMode){
     enterClientMode();
     loadClientOrder();
+    startClientPolling();
     return;
   }
     const saved=loadState();
   if(saved)applyState(saved);else initFresh();
   applyBgUI();
-  renderHppRows();renderPresets();renderHistory();
+  renderHppRows();renderPresets();
   updateAll();
 })();
+/* ============ ICON INIT ============ */
+function renderIcons(){
+  if(window.lucide)lucide.createIcons();
+}
+// Initial render
+setTimeout(renderIcons,100);
+
+// Expose untuk dipanggil setelah render dinamis
+window.renderIcons=renderIcons;
 </script>
+
 </body>
 </html>
