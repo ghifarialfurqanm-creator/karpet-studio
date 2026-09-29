@@ -23,40 +23,24 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
 <style>
-  :root {
-    color-scheme: light;
-
-    /* Canvas — cool off-white, netral */
-    --canvas-bg: #F6F7F9;
-    --canvas-dot: rgba(15, 23, 42, 0.06);
-
-    /* UI Panel (toolbar & sidebar) */
-    --ui-panel: #1A1D24;
-    --ui-panel-text: #E6EDF3;
-    --ui-muted: #8B95A5;
-
-    /* Ink (teks di kartu) */
-    --ink: #0F172A;
-    --ink-soft: #64748B;
-
-    /* Accent — blue modern */
-    --accent: #3B82F6;
-    --accent-text: #FFFFFF;
-
-    /* Paper / kartu — pastel lembut */
-    --paper-note: #FEF3C7;
-    --paper-note-edge: #FDE68A;
-    --paper-link: #DBEAFE;
-    --paper-link-edge: #BFDBFE;
-    --paper-image: #FFFFFF;
-    --paper-image-edge: #E5E7EB;
-
-    /* Pin & status */
-    --pin: #EF4444;
-    --danger: #EF4444;
-    --shadow: rgba(15, 23, 42, 0.08);
-    --panel-row-hover: rgba(255, 255, 255, 0.06);
+  :root{
+  --ink:#222222; --paper:#FAFAFA; --paper2:#FFFFFF; --loom:#1A1A1A;
+  --gold:#FF385C; --rust:#FFB400; --thread:#00A699; --line:#EBEBEB;
+  --ok:#00A699; --muted:#717171; --scenebg:#F7F7F7; --card-shadow:rgba(0,0,0,.12); --chrome-fg:#FFFFFF;
+  --r-safe-t:env(safe-area-inset-top,0px); --r-safe-b:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#F5F5F5; --paper:#1A1A1A; --paper2:#262626; --loom:#0D0D0D;
+    --gold:#FF5A76; --rust:#FFC933; --thread:#00C4B4; --line:#404040;
+    --ok:#00C4B4; --muted:#A3A3A3; --scenebg:#262626; --card-shadow:rgba(0,0,0,.6);
   }
+}
+:root[data-theme="dark"]{
+  --ink:#F5F5F5; --paper:#1A1A1A; --paper2:#262626; --loom:#0D0D0D;
+  --gold:#FF5A76; --rust:#FFC933; --thread:#00C4B4; --line:#404040;
+  --ok:#00C4B4; --muted:#A3A3A3; --scenebg:#262626; --card-shadow:rgba(0,0,0,.6);
+}
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
@@ -424,8 +408,6 @@ label{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;disp
 .order-row .actions{display:flex;gap:6px;margin-left:auto;}
 .rev-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;
   background:rgba(156,63,43,.18);color:var(--rust);}
-/* ---------- A2. Card depth (gradient + shadow bertingkat) ---------- */
-
 
 </style>
 </head>
