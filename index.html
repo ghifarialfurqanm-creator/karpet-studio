@@ -23,7 +23,7 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
 <style>
-  :root{
+ :root{
   --ink:#222222; --paper:#FAFAFA; --paper2:#FFFFFF; --loom:#1A1A1A;
   --gold:#FF385C; --rust:#FFB400; --thread:#00A699; --line:#EBEBEB;
   --ok:#00A699; --muted:#717171; --scenebg:#F7F7F7; --card-shadow:rgba(0,0,0,.12); --chrome-fg:#FFFFFF;
@@ -41,65 +41,6 @@
   --gold:#FF5A76; --rust:#FFC933; --thread:#00C4B4; --line:#404040;
   --ok:#00C4B4; --muted:#A3A3A3; --scenebg:#262626; --card-shadow:rgba(0,0,0,.6);
 }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      color-scheme: dark;
-
-      /* Canvas — TRUE slate black, bukan brown */
-      --canvas-bg: #0D1117;
-      --canvas-dot: rgba(148, 163, 184, 0.08);
-
-      --ui-panel: #161B22;
-      --ui-panel-text: #E6EDF3;
-      --ui-muted: #6E7681;
-
-      --ink: #0F172A;
-      --ink-soft: #64748B;
-
-      --accent: #58A6FF;
-      --accent-text: #0D1117;
-
-      --paper-note: #FCD34D;
-      --paper-note-edge: #F59E0B;
-      --paper-link: #60A5FA;
-      --paper-link-edge: #3B82F6;
-      --paper-image: #D1D5DB;
-      --paper-image-edge: #9CA3AF;
-
-      --pin: #F87171;
-      --danger: #F87171;
-      --shadow: rgba(0, 0, 0, 0.6);
-      --panel-row-hover: rgba(255, 255, 255, 0.06);
-    }
-  }
-  :root[data-theme="dark"] {
-    color-scheme: dark;
-
-    --canvas-bg: #0D1117;
-    --canvas-dot: rgba(148, 163, 184, 0.08);
-
-    --ui-panel: #161B22;
-    --ui-panel-text: #E6EDF3;
-    --ui-muted: #6E7681;
-
-    --ink: #0F172A;
-    --ink-soft: #64748B;
-
-    --accent: #58A6FF;
-    --accent-text: #0D1117;
-
-    --paper-note: #FCD34D;
-    --paper-note-edge: #F59E0B;
-    --paper-link: #60A5FA;
-    --paper-link-edge: #3B82F6;
-    --paper-image: #D1D5DB;
-    --paper-image-edge: #9CA3AF;
-
-    --pin: #F87171;
-    --danger: #F87171;
-    --shadow: rgba(0, 0, 0, 0.6);
-    --panel-row-hover: rgba(255, 255, 255, 0.06);
-  }
 *{box-sizing:border-box}
 button:focus-visible,a:focus-visible{outline:2px solid var(--thread);outline-offset:2px;}
 html{scroll-behavior:smooth;scroll-padding-top:var(--r-safe-t);}
